@@ -1,6 +1,6 @@
 namespace Dame.Architecture
 {
-    class Processor
+    partial class Processor
     {
         private EmulationState currentState;
     }
