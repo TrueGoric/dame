@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace Dame
 {
@@ -31,17 +32,17 @@ namespace Dame
         public ref byte L
             => ref registers[7];
 
-        // spans for 16-bit registers
-        public Span<byte> BC
-            => registers[2..3];
-        public Span<byte> DE
-            => registers[4..5];
-        public Span<byte> HL
-            => registers[6..7];
-        public Span<byte> SP
-            => registers[8..9];
-        public Span<byte> PC
-            => registers[10..11];
+        // 16-bit registers
+        public ref ushort BC
+            => ref MemoryMarshal.Cast<byte, ushort>(registers[2..3])[0];
+        public ref ushort DE
+            => ref MemoryMarshal.Cast<byte, ushort>(registers[4..5])[0];
+        public ref ushort HL
+            => ref MemoryMarshal.Cast<byte, ushort>(registers[6..7])[0];
+        public ref ushort SP
+            => ref MemoryMarshal.Cast<byte, ushort>(registers[8..9])[0];
+        public ref ushort PC
+            => ref MemoryMarshal.Cast<byte, ushort>(registers[10..11])[0];
 
         #endregion
 
