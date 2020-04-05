@@ -6,15 +6,15 @@ namespace Dame.Processor
     {
         #region Loads
 
-        private static void Load8(ref byte to, ref byte from) => to = from;
-        private static void Load16(ref ushort to, ref ushort from) => to = from;
+        public static void Load8(ref byte to, byte from) => to = from;
+        public static void Load16(ref ushort to, ushort from) => to = from;
 
         #endregion
 
         #region Arithmetic
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Increment8(ref byte value, ref byte flags)
+        public static void Increment8(ref byte value, ref byte flags)
         {
             ++value;
 
@@ -36,7 +36,7 @@ namespace Dame.Processor
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Decrement8(ref byte value, ref byte flags)
+        public static void Decrement8(ref byte value, ref byte flags)
         {
             --value;
 
@@ -53,11 +53,11 @@ namespace Dame.Processor
                 flags.RemoveFlag(ProcessorFlags.Zero);
         }
 
-        private static void Increment16(ref ushort value) => ++value;
-        private static void Decrement16(ref ushort value) => --value;
+        public static void Increment16(ref ushort value) => ++value;
+        public static void Decrement16(ref ushort value) => --value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Add8(ref byte to, byte amount, ref byte flags)
+        public static void Add8(ref byte to, byte amount, ref byte flags)
         {
             if ((to & 0b1111) + amount > 0b1111)
             {
@@ -83,7 +83,7 @@ namespace Dame.Processor
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Subtract8(ref byte to, byte amount, ref byte flags)
+        public static void Subtract8(ref byte to, byte amount, ref byte flags)
         {
             if ((to & 0b1111) - amount < 0)
             {
@@ -109,7 +109,7 @@ namespace Dame.Processor
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Compare8(ref byte to, byte amount, ref byte flags)
+        public static void Compare8(ref byte to, byte amount, ref byte flags)
         {
             if ((to & 0b1111) - amount < 0)
             {
@@ -133,7 +133,7 @@ namespace Dame.Processor
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Add16(ref ushort to, ushort amount, ref byte flags, bool ignoreZeroFlag = false)
+        public static void Add16(ref ushort to, ushort amount, ref byte flags, bool ignoreZeroFlag = false)
         {
             if ((to & 0b1111) + amount > 0b1111)
             {
@@ -161,7 +161,7 @@ namespace Dame.Processor
         #region Logical arithmetic
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void And8(ref byte to, byte from, ref byte flags)
+        public static void And8(ref byte to, byte from, ref byte flags)
         {
             to &= from;
 
@@ -176,7 +176,7 @@ namespace Dame.Processor
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Or8(ref byte to, byte from, ref byte flags)
+        public static void Or8(ref byte to, byte from, ref byte flags)
         {
             to |= from;
 
@@ -191,7 +191,7 @@ namespace Dame.Processor
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Xor8(ref byte to, byte from, ref byte flags)
+        public static void Xor8(ref byte to, byte from, ref byte flags)
         {
             to ^= from;
 
@@ -206,7 +206,7 @@ namespace Dame.Processor
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Complement8(ref byte value, ref byte flags)
+        public static void Complement8(ref byte value, ref byte flags)
         {
             value ^= 0xff;
 
