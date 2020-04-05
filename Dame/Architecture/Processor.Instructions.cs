@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Dame.Architecture
 {
     partial class Processor
@@ -11,6 +13,7 @@ namespace Dame.Architecture
 
         #region Arithmetic
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Increment8(ref byte value, ref byte flags)
         {
             ++value;
@@ -31,7 +34,8 @@ namespace Dame.Architecture
             }
 
         }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Decrement8(ref byte value, ref byte flags)
         {
             --value;
@@ -52,6 +56,7 @@ namespace Dame.Architecture
         private static void Increment16(ref ushort value) => ++value;
         private static void Decrement16(ref ushort value) => --value;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Add8(ref byte to, byte amount, ref byte flags)
         {
             if ((to & 0b1111) + amount > 0b1111)
@@ -77,6 +82,7 @@ namespace Dame.Architecture
                 flags.RemoveFlag(ProcessorFlags.Zero);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Subtract8(ref byte to, byte amount, ref byte flags)
         {
             if ((to & 0b1111) - amount < 0)
@@ -102,6 +108,7 @@ namespace Dame.Architecture
                 flags.RemoveFlag(ProcessorFlags.Zero);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Compare8(ref byte to, byte amount, ref byte flags)
         {
             if ((to & 0b1111) - amount < 0)
@@ -125,6 +132,7 @@ namespace Dame.Architecture
                 flags.RemoveFlag(ProcessorFlags.Zero);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Add16(ref ushort to, ushort amount, ref byte flags, bool ignoreZeroFlag = false)
         {
             if ((to & 0b1111) + amount > 0b1111)
@@ -152,6 +160,7 @@ namespace Dame.Architecture
 
         #region Logical arithmetic
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void And8(ref byte to, byte from, ref byte flags)
         {
             to &= from;
@@ -166,6 +175,7 @@ namespace Dame.Architecture
                 flags.RemoveFlag(ProcessorFlags.Zero);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Or8(ref byte to, byte from, ref byte flags)
         {
             to |= from;
@@ -180,6 +190,7 @@ namespace Dame.Architecture
                 flags.RemoveFlag(ProcessorFlags.Zero);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Xor8(ref byte to, byte from, ref byte flags)
         {
             to ^= from;
@@ -194,6 +205,7 @@ namespace Dame.Architecture
                 flags.RemoveFlag(ProcessorFlags.Zero);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Complement8(ref byte value, ref byte flags)
         {
             value ^= 0xff;
