@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
 
-namespace Dame.Architecture
+namespace Dame.Processor
 {
-    partial class Processor
+    static class Instructions
     {
         #region Loads
 

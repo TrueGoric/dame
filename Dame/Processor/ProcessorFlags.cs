@@ -1,4 +1,4 @@
-namespace Dame.Architecture
+namespace Dame.Processor
 {
     enum ProcessorFlags : byte
     {
