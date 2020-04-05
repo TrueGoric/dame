@@ -1,6 +1,6 @@
 namespace Dame.Architecture
 {
-    class Memory
+    abstract class MemoryController
     {
 
     }
