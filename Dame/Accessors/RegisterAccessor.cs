@@ -8,6 +8,8 @@ namespace Dame.Accessors
 
         public EmulationState State { get; }
 
+        public byte[] Raw => State.Registers;
+
         #region Register Accessors
 
         // nice names for special registers
