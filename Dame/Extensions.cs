@@ -1,4 +1,4 @@
-using Dame.Architecture;
+using Dame.Processor;
 
 namespace Dame
 {
@@ -7,7 +7,7 @@ namespace Dame
         public static void ApplyFlag(this ref byte value, ProcessorFlags flag)
             => value |= (byte)flag;
 
-         public static void RemoveFlag(this ref byte value, ProcessorFlags flag)
+        public static void RemoveFlag(this ref byte value, ProcessorFlags flag)
             => value &= (byte)~flag;
     }
 }
