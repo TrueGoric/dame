@@ -6,7 +6,7 @@ using Dame.Memory.Blocks;
 namespace Dame.Memory
 {
     sealed class MemoryController<T>
-        where T : struct
+        where T : unmanaged
     {
         private SortedList<Range, IModifyBlock<T>> modifyBlocks;
         private SortedList<Range, IReadBlock<T>> readBlocks;

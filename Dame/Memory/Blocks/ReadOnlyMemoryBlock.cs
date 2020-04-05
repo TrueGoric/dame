@@ -4,10 +4,10 @@ using System.Runtime.CompilerServices;
 namespace Dame.Memory.Blocks
 {
     sealed class ReadOnlyMemoryBlock<T> : IReadBlock<T>
-        where T : struct
+        where T : unmanaged
     {
         private readonly Memory<T> memory;
-        
+
         public ReadOnlyMemoryBlock(Memory<T> memory)
         {
             this.memory = memory;

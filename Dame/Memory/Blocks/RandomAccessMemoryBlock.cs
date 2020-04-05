@@ -3,7 +3,7 @@ using System;
 namespace Dame.Memory.Blocks
 {
     sealed class RandomAccessMemoryBlock<T> : IModifyBlock<T>
-        where T : struct
+        where T : unmanaged
     {
         private readonly Memory<T> memory;
 
