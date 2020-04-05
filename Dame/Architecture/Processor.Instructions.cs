@@ -102,6 +102,106 @@ namespace Dame.Architecture
                 flags.RemoveFlag(ProcessorFlags.Zero);
         }
 
+        private static void Compare8(ref byte to, byte amount, ref byte flags)
+        {
+            if ((to & 0b1111) - amount < 0)
+            {
+                flags.ApplyFlag(ProcessorFlags.NibbleCarry);
+
+                if (to - amount < 0)
+                    flags.ApplyFlag(ProcessorFlags.Carry);
+            }
+            else
+            {
+                flags.RemoveFlag(ProcessorFlags.NibbleCarry);
+                flags.RemoveFlag(ProcessorFlags.Carry);
+            }
+
+            flags.ApplyFlag(ProcessorFlags.Arithmetic);
+
+            if (to - amount == 0)
+                flags.ApplyFlag(ProcessorFlags.Zero);
+            else
+                flags.RemoveFlag(ProcessorFlags.Zero);
+        }
+
+        private static void Add16(ref ushort to, ushort amount, ref byte flags, bool ignoreZeroFlag = false)
+        {
+            if ((to & 0b1111) + amount > 0b1111)
+            {
+                flags.ApplyFlag(ProcessorFlags.NibbleCarry);
+
+                if (to + amount > byte.MaxValue)
+                    flags.ApplyFlag(ProcessorFlags.Carry);
+            }
+            else
+            {
+                flags.RemoveFlag(ProcessorFlags.NibbleCarry);
+                flags.RemoveFlag(ProcessorFlags.Carry);
+            }
+
+            to += amount;
+
+            flags.RemoveFlag(ProcessorFlags.Arithmetic);
+
+            if (!ignoreZeroFlag)
+                flags.RemoveFlag(ProcessorFlags.Zero);
+        }
+
+        #endregion
+
+        #region Logical arithmetic
+
+        private static void And8(ref byte to, byte from, ref byte flags)
+        {
+            to &= from;
+
+            flags.RemoveFlag(ProcessorFlags.Arithmetic);
+            flags.ApplyFlag(ProcessorFlags.NibbleCarry);
+            flags.RemoveFlag(ProcessorFlags.Carry);
+
+            if (to == 0)
+                flags.ApplyFlag(ProcessorFlags.Zero);
+            else
+                flags.RemoveFlag(ProcessorFlags.Zero);
+        }
+
+        private static void Or8(ref byte to, byte from, ref byte flags)
+        {
+            to |= from;
+
+            flags.RemoveFlag(ProcessorFlags.Arithmetic);
+            flags.RemoveFlag(ProcessorFlags.NibbleCarry);
+            flags.RemoveFlag(ProcessorFlags.Carry);
+
+            if (to == 0)
+                flags.ApplyFlag(ProcessorFlags.Zero);
+            else
+                flags.RemoveFlag(ProcessorFlags.Zero);
+        }
+
+        private static void Xor8(ref byte to, byte from, ref byte flags)
+        {
+            to ^= from;
+
+            flags.RemoveFlag(ProcessorFlags.Arithmetic);
+            flags.RemoveFlag(ProcessorFlags.NibbleCarry);
+            flags.RemoveFlag(ProcessorFlags.Carry);
+
+            if (to == 0)
+                flags.ApplyFlag(ProcessorFlags.Zero);
+            else
+                flags.RemoveFlag(ProcessorFlags.Zero);
+        }
+
+        private static void Complement8(ref byte value, ref byte flags)
+        {
+            value ^= 0xff;
+
+            flags.ApplyFlag(ProcessorFlags.Arithmetic);
+            flags.ApplyFlag(ProcessorFlags.NibbleCarry);
+        }
+
         #endregion
 
     }
