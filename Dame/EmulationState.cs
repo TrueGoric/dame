@@ -5,6 +5,8 @@ namespace Dame
     class EmulationState : IDisposable
     {
         public readonly byte[] Registers;
+        public readonly Memory<byte> ROM;
+        public readonly Memory<byte> RAM;
 
         public EmulationState()
         {
