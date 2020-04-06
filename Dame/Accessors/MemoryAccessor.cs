@@ -28,6 +28,9 @@ namespace Dame.Accessors
             for (int i = 0; i < sizeof(TMarshal); i++)
                 toBeCast[i] = Read();
             
+            if (!BitConverter.IsLittleEndian)
+                toBeCast.Reverse();
+            
             return MemoryMarshal.Cast<T, TMarshal>(toBeCast)[0];
         }
     }
