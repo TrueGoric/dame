@@ -5,12 +5,11 @@ using Dame.Memory;
 
 namespace Dame.Accessors
 {
-    sealed class MemoryAccessor<T>
-        where T : unmanaged
+    sealed class MemoryAccessor
     {
-        private readonly MemoryController<T> memoryController;
+        private readonly MemoryController memoryController;
 
-        public MemoryAccessor(MemoryController<T> controller)
+        public MemoryAccessor(MemoryController controller)
         {
             memoryController = controller;
         }
@@ -18,24 +17,19 @@ namespace Dame.Accessors
         public int Location { get; set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Read() => memoryController.Read(Location++);
+        public byte Read() => memoryController.Read(Location++);
 
-        public unsafe TMarshal ReadCast<TMarshal>()
-            where TMarshal : unmanaged
+        public unsafe ushort ReadDouble()
         {
-            if (sizeof(TMarshal) % sizeof(T) != 0)
-                throw new NotSupportedException($"Base ({typeof(T)}) and marshaled ({typeof(TMarshal)}) types must be divisible in length!");
-            
-            var castSize = sizeof(TMarshal) / sizeof(T);
-            Span<T> toBeCast = stackalloc T[castSize];
+            Span<byte> toBeCast = stackalloc byte[2];
 
-            for (int i = 0; i < castSize; i++)
-                toBeCast[i] = Read();
+            toBeCast[0] = Read();
+            toBeCast[1] = Read();
             
             if (!BitConverter.IsLittleEndian)
                 toBeCast.Reverse();
             
-            return MemoryMarshal.Cast<T, TMarshal>(toBeCast)[0];
+            return MemoryMarshal.Cast<byte, ushort>(toBeCast)[0];
         }
     }
 }

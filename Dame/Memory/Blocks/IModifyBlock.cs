@@ -2,9 +2,8 @@ using System;
 
 namespace Dame.Memory.Blocks
 {
-    interface IModifyBlock<T> : IReadBlock<T>, IWriteBlock<T>
-        where T : unmanaged
+    interface IModifyBlock : IReadBlock, IWriteBlock
     {
-        ref T Get(int address);
+        ref byte Get(int address);
     }
 }

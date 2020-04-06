@@ -5,12 +5,11 @@ using Dame.Memory.Blocks;
 
 namespace Dame.Memory
 {
-    sealed class MemoryController<T>
-        where T : unmanaged
+    sealed class MemoryController
     {
-        private SortedList<Range, IModifyBlock<T>> modifyBlocks;
-        private SortedList<Range, IReadBlock<T>> readBlocks;
-        private SortedList<Range, IWriteBlock<T>> writeBlocks;
+        private SortedList<Range, IModifyBlock> modifyBlocks;
+        private SortedList<Range, IReadBlock> readBlocks;
+        private SortedList<Range, IWriteBlock> writeBlocks;
 
         public int AddressSpace { get; }
 
@@ -20,19 +19,19 @@ namespace Dame.Memory
         }
 
         public void AddBlock<TBlock>(Range range, TBlock block)
-            where TBlock : IReadBlock<T>, IModifyBlock<T>, IWriteBlock<T>
+            where TBlock : IReadBlock, IModifyBlock, IWriteBlock
         {
-            if (block is IReadBlock<T> readBlock)
+            if (block is IReadBlock readBlock)
                 readBlocks.Add(range, readBlock);
-            if (block is IWriteBlock<T> writeBlock)
+            if (block is IWriteBlock writeBlock)
                 writeBlocks.Add(range, writeBlock);
-            if (block is IModifyBlock<T> modifyBlock)
+            if (block is IModifyBlock modifyBlock)
                 modifyBlocks.Add(range, modifyBlock);
         }
 
         #region Memory Access
 
-        public ref T Get(int address)
+        public ref byte Get(int address)
         {
             foreach (var block in modifyBlocks)
             {
@@ -45,7 +44,7 @@ namespace Dame.Memory
             throw new AccessViolationException($"Address {address} cannot be read from!");
         }
 
-        public T Read(int address)
+        public byte Read(int address)
         {
             foreach (var block in readBlocks)
             {
@@ -58,7 +57,7 @@ namespace Dame.Memory
             throw new AccessViolationException($"Address {address} cannot be read from!");
         }
 
-        public void Write(int address, T value)
+        public void Write(int address, byte value)
         {
             foreach (var block in writeBlocks)
             {
@@ -73,7 +72,7 @@ namespace Dame.Memory
 
         #endregion
 
-        public MemoryAccessor<T> CreateAccessor() => new MemoryAccessor<T>(this);
+        public MemoryAccessor CreateAccessor() => new MemoryAccessor(this);
 
         private bool RangeContains(int offset, int length, int address)
             => address >= offset && address < offset + length;

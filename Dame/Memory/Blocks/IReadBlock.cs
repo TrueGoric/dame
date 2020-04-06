@@ -2,9 +2,8 @@ using System;
 
 namespace Dame.Memory.Blocks
 {
-    interface IReadBlock<T>
-        where T : unmanaged
+    interface IReadBlock
     {
-        T Read(int address);
+        byte Read(int address);
     }
 }

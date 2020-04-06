@@ -2,31 +2,30 @@ using System;
 
 namespace Dame.Memory.Blocks
 {
-    sealed class RandomAccessMemoryBlock<T> : IModifyBlock<T>
-        where T : unmanaged
+    sealed class RandomAccessMemoryBlock : IModifyBlock
     {
-        private readonly Memory<T> memory;
+        private readonly Memory<byte> memory;
 
-        public RandomAccessMemoryBlock(Memory<T> memory)
+        public RandomAccessMemoryBlock(Memory<byte> memory)
         {
             this.memory = memory;
         }
 
-        public ref T Get(int address)
+        public ref byte Get(int address)
         {
             ThrowIfOutOfBounds(address);
 
             return ref memory.Span[address];
         }
 
-        public T Read(int address)
+        public byte Read(int address)
         {
             ThrowIfOutOfBounds(address);
 
             return memory.Span[address];
         }
 
-        public void Write(int address, T value)
+        public void Write(int address, byte value)
         {
             ThrowIfOutOfBounds(address);
 

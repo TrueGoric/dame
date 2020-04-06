@@ -3,17 +3,16 @@ using System.Runtime.CompilerServices;
 
 namespace Dame.Memory.Blocks
 {
-    sealed class ReadOnlyMemoryBlock<T> : IReadBlock<T>
-        where T : unmanaged
+    sealed class ReadOnlyMemoryBlock : IReadBlock
     {
-        private readonly Memory<T> memory;
+        private readonly Memory<byte> memory;
 
-        public ReadOnlyMemoryBlock(Memory<T> memory)
+        public ReadOnlyMemoryBlock(Memory<byte> memory)
         {
             this.memory = memory;
         }
 
-        public T Read(int address)
+        public byte Read(int address)
         {
             if (address >= memory.Length)
                 throw new ArgumentException($"Address {address} is out of bounds!", nameof(address));
