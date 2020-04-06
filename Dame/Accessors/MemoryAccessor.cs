@@ -23,9 +23,13 @@ namespace Dame.Accessors
         public unsafe TMarshal ReadCast<TMarshal>()
             where TMarshal : unmanaged
         {
-            Span<T> toBeCast = stackalloc T[sizeof(TMarshal)];
+            if (sizeof(TMarshal) % sizeof(T) != 0)
+                throw new NotSupportedException($"Base ({typeof(T)}) and marshaled ({typeof(TMarshal)}) types must be divisible in length!");
+            
+            var castSize = sizeof(TMarshal) / sizeof(T);
+            Span<T> toBeCast = stackalloc T[castSize];
 
-            for (int i = 0; i < sizeof(TMarshal); i++)
+            for (int i = 0; i < castSize; i++)
                 toBeCast[i] = Read();
             
             if (!BitConverter.IsLittleEndian)
