@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Dame.Opcodes
+namespace Dame.Instructions
 {
     class InstructionVariableManager
     {
