@@ -6,6 +6,7 @@ namespace Dame.Processor
         Arithmetic = 1 << 6, // 0 for add, 1 for sub
         HalfCarry = 1 << 5,
         Carry = 1 << 4,
-        All = Zero | Arithmetic | HalfCarry | Carry
+        All = Zero | Arithmetic | HalfCarry | Carry,
+        None = 0
     }
 }
