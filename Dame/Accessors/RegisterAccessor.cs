@@ -109,6 +109,9 @@ namespace Dame.Accessors
 
         #region Setters
 
+        public void SetRaw(int address, byte value)
+            => Raw[address] = value;
+
         public void SetFlags(byte value)
             => Flags = value;
         public void SetAccumulator(byte value)
