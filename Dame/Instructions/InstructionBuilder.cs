@@ -17,19 +17,20 @@ namespace Dame.Instructions
             Conditional
         }
 
-        private ProcessorFlags flagsRead = ProcessorFlags.None;
-
-        private int cyclesUsed;
+        private int opcode;
+        private string mnemonic;
+        private int cycles;
 
         private ParameterExpression flagsVariable;
+        private ProcessorFlags flagsRead = ProcessorFlags.None;
 
         private List<(ExpressionGroup Group, Expression Expr)> expressions;
 
-
-
-        public InstructionBuilder(string name, int cycles)
+        public InstructionBuilder(int opcode, string mnemonic, int cycles)
         {
-            cyclesUsed = cycles;
+            this.opcode = opcode;
+            this.mnemonic = mnemonic;
+            this.cycles = cycles;
 
             flagsVariable = Expression.Variable(typeof(byte));
         }
