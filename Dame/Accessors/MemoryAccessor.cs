@@ -16,20 +16,15 @@ namespace Dame.Accessors
 
         public int Location { get; set; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte Read() => memoryController.Read(Location++);
 
         public unsafe ushort ReadDouble()
         {
-            Span<byte> toBeCast = stackalloc byte[2];
+            var value = memoryController.ReadDouble(Location);
 
-            toBeCast[0] = Read();
-            toBeCast[1] = Read();
-            
-            if (!BitConverter.IsLittleEndian)
-                toBeCast.Reverse();
-            
-            return MemoryMarshal.Cast<byte, ushort>(toBeCast)[0];
+            Location += 2;
+
+            return value;
         }
     }
 }
