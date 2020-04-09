@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Dame.Accessors;
+using Dame.Instructions;
 using Dame.Memory;
 
 namespace Dame.Processor
@@ -11,6 +13,8 @@ namespace Dame.Processor
 
         private RegisterAccessor registers;
         private MemoryAccessor assembly;
+
+        private Dictionary<int, Instruction> opcodes;
 
         
     }
