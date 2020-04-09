@@ -12,6 +12,16 @@ namespace Dame.Instructions
         public InstructionBuilder Add<T, U>(ParameterExpression variable, Expression<InstructionValue<U>> expression)
             where T : unmanaged
             where U : unmanaged
+            => Add<T, U>(variable, expression);
+
+        public InstructionBuilder Add<T, U>(ParameterExpression variable, U value)
+            where T : unmanaged
+            where U : unmanaged
+            => Add<T, U>(variable, Expression.Constant(value, typeof(U)));
+
+        private InstructionBuilder Add<T, U>(ParameterExpression variable, Expression expression)
+            where T : unmanaged
+            where U : unmanaged
         {
             ThrowOnUnsupportedType<T>();
             ThrowOnUnsupportedType<U>();
@@ -45,6 +55,14 @@ namespace Dame.Instructions
         }
 
         public InstructionBuilder Subtract<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
+            where T : unmanaged
+            => Subtract<T>(variable, expression);
+
+        public InstructionBuilder Subtract<T>(ParameterExpression variable, T value)
+            where T : unmanaged
+            => Subtract<T>(variable, Expression.Constant(value, typeof(T)));
+
+        private InstructionBuilder Subtract<T>(ParameterExpression variable, Expression expression)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();

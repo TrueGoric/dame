@@ -8,8 +8,6 @@ namespace Dame.Accessors
 
         public EmulationState State { get; }
 
-        public byte[] Raw => State.Registers;
-
         #region Register Accessors
 
         // nice names for special registers
@@ -62,17 +60,18 @@ namespace Dame.Accessors
             set => emulationState.Registers[5] = value;
         }
 
-        public byte F
+        public byte A
         {
             get => emulationState.Registers[6];
             set => emulationState.Registers[6] = value;
         }
 
-        public byte A
+        public byte F
         {
             get => emulationState.Registers[7];
             set => emulationState.Registers[7] = value;
         }
+
 
         // 16-bit registers
         public ushort BC
@@ -105,12 +104,15 @@ namespace Dame.Accessors
             set => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[10..11])[0] = value;
         }
 
+        public ushort AF
+        {
+            get => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[6..7])[0];
+            set => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[6..7])[0] = value;
+        }
+
         #endregion
 
         #region Setters
-
-        public void SetRaw(int address, byte value)
-            => Raw[address] = value;
 
         public void SetFlags(byte value)
             => Flags = value;
@@ -144,6 +146,8 @@ namespace Dame.Accessors
             => SP = value;
         public void SetPC(ushort value)
             => PC = value;
+        public void SetAF(ushort value)
+            => AF = value;
 
         #endregion
 
