@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Dame.Processor;
 
 namespace Dame.Accessors
 {
@@ -114,8 +115,11 @@ namespace Dame.Accessors
 
         #region Setters
 
+        public void SetFlags(byte value, ProcessorFlags mask)
+            => Flags = (byte)((value & (byte)mask) & (Flags & ~(byte)mask));
         public void SetFlags(byte value)
             => Flags = value;
+            
         public void SetAccumulator(byte value)
             => Accumulator = value;
 

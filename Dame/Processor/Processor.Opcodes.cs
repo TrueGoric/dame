@@ -20,8 +20,8 @@ namespace Dame.Processor
             public int Opcode { get; set; }
 
             public Expression<InstructionValue<T>> Input { get; set; }
+            public Expression<InstructionValue<T>> ExtraInput { get; set; }
             public Expression<InstructionFunction<T>> Output { get; set; }
-            public Expression<InstructionFunction<T>> ExtraOutput { get; set; }
 
             public Mapping(int cycles,
                 int opcode,
@@ -30,7 +30,7 @@ namespace Dame.Processor
                 Expression<InstructionFunction<T>> output = null,
                 string inputName = null,
                 Expression<InstructionValue<T>> input = null,
-                Expression<InstructionFunction<T>> extraOutput = null)
+                Expression<InstructionValue<T>> extraInput = null)
             {
                 Cycles = cycles;
                 Opcode = opcode;
@@ -46,7 +46,7 @@ namespace Dame.Processor
 
                 Input = input;
                 Output = output;
-                ExtraOutput = extraOutput;
+                ExtraInput = extraInput;
             }
         }
 
@@ -221,18 +221,18 @@ namespace Dame.Processor
             foreach (var mapping in load16Mappings)
             {
                 this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input(vars.Get<ushort>("VAL16"), mapping.Input)
-                    .Output(vars.Get<ushort>("VAL16"), mapping.Output)
+                    .Input  (vars.Get<ushort>("VAL16"), mapping.Input)
+                    .Output (vars.Get<ushort>("VAL16"), mapping.Output)
                     .Compile();
             }
 
             // LD HL, SP + r8
             this.opcodes[0xF8] = new InstructionBuilder(0xF8, "LD HL, SP + r8", 12)
-                    .Input(vars.Get<ushort>("VAL16"), () => registers.SP)
-                    .Add<ushort, byte>(vars.Get<ushort>("VAL16"), () => assembly.Read())
-                    .UnsetFlags(ProcessorFlags.Zero | ProcessorFlags.Arithmetic)
-                    .ReadFlags(flags => registers.SetFlags(flags))
-                    .Output(vars.Get<ushort>("VAL16"), (ushort val) => registers.SetHL(val))
+                    .Input              (vars.Get<ushort>("VAL16"), () => registers.SP)
+                    .Add<ushort, byte>  (vars.Get<ushort>("VAL16"), () => assembly.Read())
+                    .UnsetFlags         (ProcessorFlags.Zero | ProcessorFlags.Arithmetic)
+                    .ReadFlags          (flags => registers.SetFlags(flags))
+                    .Output             (vars.Get<ushort>("VAL16"), (ushort val) => registers.SetHL(val))
                     .Compile();
 
             var pushMappings = new Mapping<ushort>[]
@@ -246,11 +246,11 @@ namespace Dame.Processor
             foreach (var mapping in pushMappings)
             {
                 this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input(vars.Get<ushort>("STACK16"), () => registers.SP)
-                    .Subtract<ushort>(vars.Get<ushort>("STACK16"), 2)
-                    .Output(vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
-                    .Input(vars.Get<ushort>("PTR16"), mapping.Input)
-                    .Output(vars.Get<ushort>("PTR16"), (ushort val) => memoryController.WriteDouble(registers.SP, val))
+                    .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                    .Subtract<ushort>   (vars.Get<ushort>("STACK16"), 2)
+                    .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                    .Input              (vars.Get<ushort>("PTR16"), mapping.Input)
+                    .Output             (vars.Get<ushort>("PTR16"), (ushort val) => memoryController.WriteDouble(registers.SP, val))
                     .Compile();
             }
 
@@ -265,11 +265,252 @@ namespace Dame.Processor
             foreach (var mapping in popMappings)
             {
                 this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input(vars.Get<ushort>("PTR16"), () => memoryController.ReadDouble(registers.SP))
-                    .Output(vars.Get<ushort>("PTR16"), mapping.Output)
-                    .Input(vars.Get<ushort>("STACK16"), () => registers.SP)
+                    .Input              (vars.Get<ushort>("PTR16"), () => memoryController.ReadDouble(registers.SP))
+                    .Output             (vars.Get<ushort>("PTR16"), mapping.Output)
+                    .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
                     .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
-                    .Output(vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                    .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                    .Compile();
+            }
+
+            #endregion
+
+            #region 8-bit arithmetic
+
+            var incMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(4, 0x04, "INC", "B", val => registers.SetB(val), null, () => registers.B),
+                new Mapping<byte>(4, 0x0C, "INC", "C", val => registers.SetC(val), null, () => registers.C),
+                new Mapping<byte>(4, 0x14, "INC", "D", val => registers.SetD(val), null, () => registers.D),
+                new Mapping<byte>(4, 0x1C, "INC", "E", val => registers.SetE(val), null, () => registers.E),
+                new Mapping<byte>(4, 0x24, "INC", "H", val => registers.SetH(val), null, () => registers.H),
+                new Mapping<byte>(4, 0x2C, "INC", "L", val => registers.SetL(val), null, () => registers.L),
+                new Mapping<byte>(12, 0x34, "INC", "(HL)", val => memoryController.Write(registers.HL, val), null, () => memoryController.Read(registers.HL)),
+                new Mapping<byte>(4, 0x3C, "INC", "A", val => registers.SetA(val), null, () => registers.A),
+            };
+
+            foreach (var mapping in incMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
+                    .Input          (vars.Get<byte>("VAL8"), mapping.Input)
+                    .Add<byte, byte>(vars.Get<byte>("VAL8"), 1)
+                    .ReadFlags      (flags => registers.SetFlags(flags, ProcessorFlags.Zero | ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry))
+                    .Output         (vars.Get<byte>("VAL8"), mapping.Output)
+                    .Compile();
+            }
+
+            var decMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(4, 0x05, "DEC", "B", val => registers.SetB(val), null, () => registers.B),
+                new Mapping<byte>(4, 0x0D, "DEC", "C", val => registers.SetC(val), null, () => registers.C),
+                new Mapping<byte>(4, 0x15, "DEC", "D", val => registers.SetD(val), null, () => registers.D),
+                new Mapping<byte>(4, 0x1D, "DEC", "E", val => registers.SetE(val), null, () => registers.E),
+                new Mapping<byte>(4, 0x25, "DEC", "H", val => registers.SetH(val), null, () => registers.H),
+                new Mapping<byte>(4, 0x2D, "DEC", "L", val => registers.SetL(val), null, () => registers.L),
+                new Mapping<byte>(12, 0x35, "DEC", "(HL)", val => memoryController.Write(registers.HL, val), null, () => memoryController.Read(registers.HL)),
+                new Mapping<byte>(4, 0x3D, "DEC", "A", val => registers.SetA(val), null, () => registers.A),
+            };
+
+            foreach (var mapping in decMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
+                    .Input          (vars.Get<byte>("VAL8"), mapping.Input)
+                    .Subtract<byte> (vars.Get<byte>("VAL8"), 1)
+                    .ReadFlags      (flags => registers.SetFlags(flags, ProcessorFlags.Zero | ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry))
+                    .Output         (vars.Get<byte>("VAL8"), mapping.Output)
+                    .Compile();
+            }
+
+            var addMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(4, 0x80, "ADD", "A", null, "B", () => registers.B),
+                new Mapping<byte>(4, 0x81, "ADD", "A", null, "C", () => registers.C),
+                new Mapping<byte>(4, 0x82, "ADD", "A", null, "D", () => registers.D),
+                new Mapping<byte>(4, 0x83, "ADD", "A", null, "E", () => registers.E),
+                new Mapping<byte>(4, 0x84, "ADD", "A", null, "H", () => registers.H),
+                new Mapping<byte>(4, 0x85, "ADD", "A", null, "L", () => registers.L),
+                new Mapping<byte>(8, 0x86, "ADD", "A", null, "(HL)", () => memoryController.Read(registers.HL)),
+                new Mapping<byte>(4, 0x87, "ADD", "A", null, "A", () => registers.A),
+
+                new Mapping<byte>(8, 0xC6, "ADD", "A", null, "d8", () => assembly.Read()),
+            };
+
+            foreach (var mapping in addMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
+                    .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                    .Add<byte, byte>(vars.Get<byte>("VAL8"), mapping.Input)
+                    .ReadFlags      (flags => registers.SetFlags(flags))
+                    .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                    .Compile();
+            }
+
+            var addCarryMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(4, 0x88, "ADC", "A", null, "B", () => registers.B),
+                new Mapping<byte>(4, 0x89, "ADC", "A", null, "C", () => registers.C),
+                new Mapping<byte>(4, 0x8A, "ADC", "A", null, "D", () => registers.D),
+                new Mapping<byte>(4, 0x8B, "ADC", "A", null, "E", () => registers.E),
+                new Mapping<byte>(4, 0x8C, "ADC", "A", null, "H", () => registers.H),
+                new Mapping<byte>(4, 0x8D, "ADC", "A", null, "L", () => registers.L),
+                new Mapping<byte>(8, 0x8E, "ADC", "A", null, "(HL)", () => memoryController.Read(registers.HL)),
+                new Mapping<byte>(4, 0x8F, "ADC", "A", null, "A", () => registers.A),
+
+                new Mapping<byte>(8, 0xCE, "ADC", "A", null, "d8", () => assembly.Read()),
+            };
+
+            foreach (var mapping in addCarryMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
+                    .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                    .WriteFlags     (() => registers.Flags)
+                    .Add<byte, byte>(vars.Get<byte>("VAL8"), mapping.Input, true)
+                    .ReadFlags      (flags => registers.SetFlags(flags))
+                    .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                    .Compile();
+            }
+
+            var subMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(4, 0x90, "SUB", "A", null, "B", () => registers.B),
+                new Mapping<byte>(4, 0x91, "SUB", "A", null, "C", () => registers.C),
+                new Mapping<byte>(4, 0x92, "SUB", "A", null, "D", () => registers.D),
+                new Mapping<byte>(4, 0x93, "SUB", "A", null, "E", () => registers.E),
+                new Mapping<byte>(4, 0x94, "SUB", "A", null, "H", () => registers.H),
+                new Mapping<byte>(4, 0x95, "SUB", "A", null, "L", () => registers.L),
+                new Mapping<byte>(8, 0x96, "SUB", "A", null, "(HL)", () => memoryController.Read(registers.HL)),
+                new Mapping<byte>(4, 0x97, "SUB", "A", null, "A", () => registers.A),
+
+                new Mapping<byte>(8, 0xD6, "SUB", "A", null, "d8", () => assembly.Read()),
+            };
+
+            foreach (var mapping in subMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
+                    .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                    .Subtract<byte> (vars.Get<byte>("VAL8"), mapping.Input)
+                    .ReadFlags      (flags => registers.SetFlags(flags))
+                    .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                    .Compile();
+            }
+
+            var subCarryMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(4, 0x98, "SBC", "A", null, "B", () => registers.B),
+                new Mapping<byte>(4, 0x99, "SBC", "A", null, "C", () => registers.C),
+                new Mapping<byte>(4, 0x9A, "SBC", "A", null, "D", () => registers.D),
+                new Mapping<byte>(4, 0x9B, "SBC", "A", null, "E", () => registers.E),
+                new Mapping<byte>(4, 0x9C, "SBC", "A", null, "H", () => registers.H),
+                new Mapping<byte>(4, 0x9D, "SBC", "A", null, "L", () => registers.L),
+                new Mapping<byte>(8, 0x9E, "SBC", "A", null, "(HL)", () => memoryController.Read(registers.HL)),
+                new Mapping<byte>(4, 0x9F, "SBC", "A", null, "A", () => registers.A),
+
+                new Mapping<byte>(8, 0xDE, "SBC", "A", null, "d8", () => assembly.Read()),
+            };
+
+            foreach (var mapping in subCarryMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
+                    .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                    .WriteFlags     (() => registers.Flags)
+                    .Add<byte, byte>(vars.Get<byte>("VAL8"), mapping.Input, true)
+                    .ReadFlags      (flags => registers.SetFlags(flags))
+                    .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                    .Compile();
+            }
+
+            var andMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(4, 0xA0, "AND", "A", null, "B", () => registers.B),
+                new Mapping<byte>(4, 0xA1, "AND", "A", null, "C", () => registers.C),
+                new Mapping<byte>(4, 0xA2, "AND", "A", null, "D", () => registers.D),
+                new Mapping<byte>(4, 0xA3, "AND", "A", null, "E", () => registers.E),
+                new Mapping<byte>(4, 0xA4, "AND", "A", null, "H", () => registers.H),
+                new Mapping<byte>(4, 0xA5, "AND", "A", null, "L", () => registers.L),
+                new Mapping<byte>(8, 0xA6, "AND", "A", null, "(HL)", () => memoryController.Read(registers.HL)),
+                new Mapping<byte>(4, 0xA7, "AND", "A", null, "A", () => registers.A),
+
+                new Mapping<byte>(8, 0xE6, "AND", "A", null, "d8", () => assembly.Read()),
+            };
+
+            foreach (var mapping in andMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
+                    .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                    .And<byte>  (vars.Get<byte>("VAL8"), mapping.Input)
+                    .ReadFlags  (flags => registers.SetFlags(flags))
+                    .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                    .Compile();
+            }
+
+            var xorMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(4, 0xA8, "XOR", "A", null, "B", () => registers.B),
+                new Mapping<byte>(4, 0xA9, "XOR", "A", null, "C", () => registers.C),
+                new Mapping<byte>(4, 0xAA, "XOR", "A", null, "D", () => registers.D),
+                new Mapping<byte>(4, 0xAB, "XOR", "A", null, "E", () => registers.E),
+                new Mapping<byte>(4, 0xAC, "XOR", "A", null, "H", () => registers.H),
+                new Mapping<byte>(4, 0xAD, "XOR", "A", null, "L", () => registers.L),
+                new Mapping<byte>(8, 0xAE, "XOR", "A", null, "(HL)", () => memoryController.Read(registers.HL)),
+                new Mapping<byte>(4, 0xAF, "XOR", "A", null, "A", () => registers.A),
+
+                new Mapping<byte>(8, 0xEE, "XOR", "A", null, "d8", () => assembly.Read()),
+            };
+
+            foreach (var mapping in xorMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
+                    .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                    .Xor<byte>  (vars.Get<byte>("VAL8"), mapping.Input)
+                    .ReadFlags  (flags => registers.SetFlags(flags))
+                    .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                    .Compile();
+            }
+
+            var orMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(4, 0xB0, "OR", "A", null, "B", () => registers.B),
+                new Mapping<byte>(4, 0xB1, "OR", "A", null, "C", () => registers.C),
+                new Mapping<byte>(4, 0xB2, "OR", "A", null, "D", () => registers.D),
+                new Mapping<byte>(4, 0xB3, "OR", "A", null, "E", () => registers.E),
+                new Mapping<byte>(4, 0xB4, "OR", "A", null, "H", () => registers.H),
+                new Mapping<byte>(4, 0xB5, "OR", "A", null, "L", () => registers.L),
+                new Mapping<byte>(8, 0xB6, "OR", "A", null, "(HL)", () => memoryController.Read(registers.HL)),
+                new Mapping<byte>(4, 0xB7, "OR", "A", null, "A", () => registers.A),
+
+                new Mapping<byte>(8, 0xF6, "OR", "A", null, "d8", () => assembly.Read()),
+            };
+
+            foreach (var mapping in orMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
+                    .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                    .Or<byte>   (vars.Get<byte>("VAL8"), mapping.Input)
+                    .ReadFlags  (flags => registers.SetFlags(flags))
+                    .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                    .Compile();
+            }
+
+            var cpMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(4, 0xB8, "CP", "A", null, "B", () => registers.B),
+                new Mapping<byte>(4, 0xB9, "CP", "A", null, "C", () => registers.C),
+                new Mapping<byte>(4, 0xBA, "CP", "A", null, "D", () => registers.D),
+                new Mapping<byte>(4, 0xBB, "CP", "A", null, "E", () => registers.E),
+                new Mapping<byte>(4, 0xBC, "CP", "A", null, "H", () => registers.H),
+                new Mapping<byte>(4, 0xBD, "CP", "A", null, "L", () => registers.L),
+                new Mapping<byte>(8, 0xBE, "CP", "A", null, "(HL)", () => memoryController.Read(registers.HL)),
+                new Mapping<byte>(4, 0xBF, "CP", "A", null, "A", () => registers.A),
+
+                new Mapping<byte>(8, 0xFE, "CP", "A", null, "d8", () => assembly.Read()),
+            };
+
+            foreach (var mapping in cpMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
+                    .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                    .Subtract<byte> (vars.Get<byte>("VAL8"), mapping.Input)
+                    .ReadFlags      (flags => registers.SetFlags(flags))
                     .Compile();
             }
 

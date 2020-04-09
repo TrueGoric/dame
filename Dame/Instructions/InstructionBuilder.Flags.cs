@@ -49,5 +49,8 @@ namespace Dame.Instructions
             => assignment
                 ? Expression.OrAssign(flagsVariable, Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte)))
                 : Expression.AndAssign(flagsVariable, Expression.OnesComplement(Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte))));
+        
+        private Expression GetCarryFlagValue()
+            => Expression.And(Expression.RightShift(flagsVariable, Expression.Constant(4)), Expression.Constant(0x1));
     }
 }
