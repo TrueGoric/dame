@@ -45,6 +45,7 @@ namespace Dame.Instructions
             switch (Type.GetTypeCode(typeof(T)))
             {
                 case TypeCode.Byte:
+                case TypeCode.SByte:
                 case TypeCode.UInt16:
                 case TypeCode.UInt32:
                     return;

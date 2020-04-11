@@ -229,7 +229,7 @@ namespace Dame.Processor
             // LD HL, SP + r8
             this.opcodes[0xF8] = new InstructionBuilder(0xF8, "LD HL, SP + r8", 12)
                     .Input              (vars.Get<ushort>("VAL16"), () => registers.SP)
-                    .Add<ushort, byte>  (vars.Get<ushort>("VAL16"), () => assembly.Read())
+                    .Add<ushort, sbyte> (vars.Get<ushort>("VAL16"), () => assembly.Read().TwosComplement())
                     .UnsetFlags         (ProcessorFlags.Zero | ProcessorFlags.Arithmetic)
                     .ReadFlags          (flags => registers.SetFlags(flags))
                     .Output             (vars.Get<ushort>("VAL16"), (ushort val) => registers.SetHL(val))

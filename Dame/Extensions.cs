@@ -17,5 +17,8 @@ namespace Dame
 
         public static void RemoveFlag(this ref byte value, ProcessorFlags flag)
             => value &= (byte)~flag;
+
+        public static sbyte TwosComplement(this byte value)
+            => value > 127 ? (sbyte)-(~(value - 1)) : (sbyte)value;
     }
 }
