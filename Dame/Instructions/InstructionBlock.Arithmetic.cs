@@ -7,19 +7,19 @@ using Dame.Processor;
 
 namespace Dame.Instructions
 {
-    sealed partial class InstructionBuilder
+    sealed partial class InstructionBlock
     {
-        public InstructionBuilder Add<T, U>(ParameterExpression variable, Expression<InstructionValue<U>> expression, bool withCarry = false)
+        public InstructionBlock Add<T, U>(ParameterExpression variable, Expression<InstructionValue<U>> expression, bool withCarry = false)
             where T : unmanaged
             where U : unmanaged
             => Add<T, U>(variable, expression);
 
-        public InstructionBuilder Add<T, U>(ParameterExpression variable, U value, bool withCarry = false)
+        public InstructionBlock Add<T, U>(ParameterExpression variable, U value, bool withCarry = false)
             where T : unmanaged
             where U : unmanaged
             => Add<T, U>(variable, Expression.Constant(value, typeof(U)));
 
-        private InstructionBuilder Add<T, U>(ParameterExpression variable, Expression expression, bool withCarry = false)
+        private InstructionBlock Add<T, U>(ParameterExpression variable, Expression expression, bool withCarry = false)
             where T : unmanaged
             where U : unmanaged
         {
@@ -58,15 +58,15 @@ namespace Dame.Instructions
             return this;
         }
 
-        public InstructionBuilder Subtract<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression, bool withCarry = false)
+        public InstructionBlock Subtract<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression, bool withCarry = false)
             where T : unmanaged
             => Subtract<T>(variable, expression);
 
-        public InstructionBuilder Subtract<T>(ParameterExpression variable, T value, bool withCarry = false)
+        public InstructionBlock Subtract<T>(ParameterExpression variable, T value, bool withCarry = false)
             where T : unmanaged
             => Subtract<T>(variable, Expression.Constant(value, typeof(T)));
 
-        private InstructionBuilder Subtract<T>(ParameterExpression variable, Expression expression, bool withCarry = false)
+        private InstructionBlock Subtract<T>(ParameterExpression variable, Expression expression, bool withCarry = false)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
@@ -97,7 +97,7 @@ namespace Dame.Instructions
             return this;
         }
 
-        public InstructionBuilder Or<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
+        public InstructionBlock Or<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
@@ -120,7 +120,7 @@ namespace Dame.Instructions
             return this;
         }
 
-        public InstructionBuilder And<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
+        public InstructionBlock And<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
@@ -143,7 +143,7 @@ namespace Dame.Instructions
             return this;
         }
 
-        public InstructionBuilder Xor<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
+        public InstructionBlock Xor<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
@@ -166,7 +166,7 @@ namespace Dame.Instructions
             return this;
         }
 
-        public InstructionBuilder Complement<T>(ParameterExpression variable)
+        public InstructionBlock Complement<T>(ParameterExpression variable)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();

@@ -7,9 +7,9 @@ using Dame.Processor;
 
 namespace Dame.Instructions
 {
-    sealed partial class InstructionBuilder
+    sealed partial class InstructionBlock
     {
-        public InstructionBuilder Input<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
+        public InstructionBlock Input<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
@@ -20,7 +20,7 @@ namespace Dame.Instructions
             return this;
         }
 
-        public InstructionBuilder Output<T>(ParameterExpression variable, Expression<InstructionFunction<T>> expression)
+        public InstructionBlock Output<T>(ParameterExpression variable, Expression<InstructionFunction<T>> expression)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();

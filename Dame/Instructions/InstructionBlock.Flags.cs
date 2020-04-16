@@ -7,16 +7,16 @@ using Dame.Processor;
 
 namespace Dame.Instructions
 {
-    sealed partial class InstructionBuilder
+    sealed partial class InstructionBlock
     {
-        public InstructionBuilder WriteFlags(Expression<InstructionValue<byte>> expression)
+        public InstructionBlock WriteFlags(Expression<InstructionValue<byte>> expression)
         {
             expressions.Add((ExpressionGroup.IO, Expression.Assign(flagsVariable, expression)));
 
             return this;
         }
 
-        public InstructionBuilder ReadFlags(Expression<InstructionFunction<byte>> expression, ProcessorFlags mask = ProcessorFlags.All)
+        public InstructionBlock ReadFlags(Expression<InstructionFunction<byte>> expression, ProcessorFlags mask = ProcessorFlags.All)
         {
             flagsRead |= mask;
 
@@ -30,12 +30,12 @@ namespace Dame.Instructions
             return this;
         }
 
-        public InstructionBuilder SetFlags(ProcessorFlags flag)
+        public InstructionBlock SetFlags(ProcessorFlags flag)
         {
             return this;
         }
 
-        public InstructionBuilder UnsetFlags(ProcessorFlags flag)
+        public InstructionBlock UnsetFlags(ProcessorFlags flag)
         {
             return this;
         }

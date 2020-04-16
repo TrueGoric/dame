@@ -7,7 +7,7 @@ using Dame.Processor;
 
 namespace Dame.Instructions
 {
-    sealed partial class InstructionBuilder
+    sealed partial class InstructionBlock
     {
         
     }

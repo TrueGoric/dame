@@ -160,46 +160,51 @@ namespace Dame.Processor
 
             foreach (var mapping in load8Mappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input(vars.Get<byte>("VAL8"), mapping.Input)
-                    .Output(vars.Get<byte>("VAL8"), mapping.Output)
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input(vars.Get<byte>("VAL8"), mapping.Input)
+                        .Output(vars.Get<byte>("VAL8"), mapping.Output))
                     .Compile();
             }
 
             // LD (HL+), A
-            this.opcodes[0x22] = new InstructionBuilder(0x22, "LD (HL+), A", 8)
-                    .Input(vars.Get<byte>("VAL8"), () => registers.A)
-                    .Output(vars.Get<byte>("VAL8"), (byte val) => memoryController.Write(registers.HL, val))
-                    .Input(vars.Get<byte>("HL"), () => registers.HL)
-                    .Add<byte, byte>(vars.Get<byte>("HL"), 1)
-                    .Output(vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl))
+            this.opcodes[0x22] = new InstructionBuilder(0x22, "LD (HL+), A", cpuContext)
+                    .With(b => b
+                        .Input(vars.Get<byte>("VAL8"), () => registers.A)
+                        .Output(vars.Get<byte>("VAL8"), (byte val) => memoryController.Write(registers.HL, val))
+                        .Input(vars.Get<byte>("HL"), () => registers.HL)
+                        .Add<byte, byte>(vars.Get<byte>("HL"), 1)
+                        .Output(vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl)))
                     .Compile();
             
             // LD (HL-), A
-            this.opcodes[0x32] = new InstructionBuilder(0x32, "LD (HL-), A", 8)
-                    .Input(vars.Get<byte>("VAL8"), () => registers.A)
-                    .Output(vars.Get<byte>("VAL8"), (byte val) => memoryController.Write(registers.HL, val))
-                    .Input(vars.Get<byte>("HL"), () => registers.HL)
-                    .Subtract<byte>(vars.Get<byte>("HL"), 1)
-                    .Output(vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl))
+            this.opcodes[0x32] = new InstructionBuilder(0x32, "LD (HL-), A", cpuContext)
+                    .With(b => b
+                        .Input(vars.Get<byte>("VAL8"), () => registers.A)
+                        .Output(vars.Get<byte>("VAL8"), (byte val) => memoryController.Write(registers.HL, val))
+                        .Input(vars.Get<byte>("HL"), () => registers.HL)
+                        .Subtract<byte>(vars.Get<byte>("HL"), 1)
+                        .Output(vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl)))
                     .Compile();
             
             // LD A, (HL+)
-            this.opcodes[0x2A] = new InstructionBuilder(0x2A, "LD A, (HL+)", 8)
-                    .Input(vars.Get<byte>("VAL8"), () => memoryController.Read(registers.HL))
-                    .Output(vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
-                    .Input(vars.Get<byte>("HL"), () => registers.HL)
-                    .Add<byte, byte>(vars.Get<byte>("HL"), 1)
-                    .Output(vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl))
+            this.opcodes[0x2A] = new InstructionBuilder(0x2A, "LD A, (HL+)", cpuContext)
+                    .With(b => b
+                        .Input(vars.Get<byte>("VAL8"), () => memoryController.Read(registers.HL))
+                        .Output(vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
+                        .Input(vars.Get<byte>("HL"), () => registers.HL)
+                        .Add<byte, byte>(vars.Get<byte>("HL"), 1)
+                        .Output(vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl)))
                     .Compile();
             
             // LD A, (HL-)
-            this.opcodes[0x3A] = new InstructionBuilder(0x3A, "LD A, (HL-)", 8)
-                    .Input(vars.Get<byte>("VAL8"), () => memoryController.Read(registers.HL))
-                    .Output(vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
-                    .Input(vars.Get<byte>("HL"), () => registers.HL)
-                    .Subtract<byte>(vars.Get<byte>("HL"), 1)
-                    .Output(vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl))
+            this.opcodes[0x3A] = new InstructionBuilder(0x3A, "LD A, (HL-)", cpuContext)
+                    .With(b => b
+                        .Input(vars.Get<byte>("VAL8"), () => memoryController.Read(registers.HL))
+                        .Output(vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
+                        .Input(vars.Get<byte>("HL"), () => registers.HL)
+                        .Subtract<byte>(vars.Get<byte>("HL"), 1)
+                        .Output(vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl)))
                     .Compile();
 
             #endregion
@@ -220,19 +225,21 @@ namespace Dame.Processor
 
             foreach (var mapping in load16Mappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input  (vars.Get<ushort>("VAL16"), mapping.Input)
-                    .Output (vars.Get<ushort>("VAL16"), mapping.Output)
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input  (vars.Get<ushort>("VAL16"), mapping.Input)
+                        .Output (vars.Get<ushort>("VAL16"), mapping.Output))
                     .Compile();
             }
 
             // LD HL, SP + r8
-            this.opcodes[0xF8] = new InstructionBuilder(0xF8, "LD HL, SP + r8", 12)
-                    .Input              (vars.Get<ushort>("VAL16"), () => registers.SP)
-                    .Add<ushort, sbyte> (vars.Get<ushort>("VAL16"), () => assembly.Read().TwosComplement())
-                    .UnsetFlags         (ProcessorFlags.Zero | ProcessorFlags.Arithmetic)
-                    .ReadFlags          (flags => registers.SetFlags(flags))
-                    .Output             (vars.Get<ushort>("VAL16"), (ushort val) => registers.SetHL(val))
+            this.opcodes[0xF8] = new InstructionBuilder(0xF8, "LD HL, SP + r8", cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<ushort>("VAL16"), () => registers.SP)
+                        .Add<ushort, sbyte> (vars.Get<ushort>("VAL16"), () => assembly.Read().TwosComplement())
+                        .UnsetFlags         (ProcessorFlags.Zero | ProcessorFlags.Arithmetic)
+                        .ReadFlags          (flags => registers.SetFlags(flags))
+                        .Output             (vars.Get<ushort>("VAL16"), (ushort val) => registers.SetHL(val)))
                     .Compile();
 
             var pushMappings = new Mapping<ushort>[]
@@ -245,12 +252,13 @@ namespace Dame.Processor
 
             foreach (var mapping in pushMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
-                    .Subtract<ushort>   (vars.Get<ushort>("STACK16"), 2)
-                    .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
-                    .Input              (vars.Get<ushort>("PTR16"), mapping.Input)
-                    .Output             (vars.Get<ushort>("PTR16"), (ushort val) => memoryController.WriteDouble(registers.SP, val))
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                        .Subtract<ushort>   (vars.Get<ushort>("STACK16"), 2)
+                        .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                        .Input              (vars.Get<ushort>("PTR16"), mapping.Input)
+                        .Output             (vars.Get<ushort>("PTR16"), (ushort val) => memoryController.WriteDouble(registers.SP, val)))
                     .Compile();
             }
 
@@ -264,12 +272,13 @@ namespace Dame.Processor
 
             foreach (var mapping in popMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input              (vars.Get<ushort>("PTR16"), () => memoryController.ReadDouble(registers.SP))
-                    .Output             (vars.Get<ushort>("PTR16"), mapping.Output)
-                    .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
-                    .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
-                    .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<ushort>("PTR16"), () => memoryController.ReadDouble(registers.SP))
+                        .Output             (vars.Get<ushort>("PTR16"), mapping.Output)
+                        .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                        .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
+                        .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val)))
                     .Compile();
             }
 
@@ -291,11 +300,12 @@ namespace Dame.Processor
 
             foreach (var mapping in incMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input          (vars.Get<byte>("VAL8"), mapping.Input)
-                    .Add<byte, byte>(vars.Get<byte>("VAL8"), 1)
-                    .ReadFlags      (flags => registers.SetFlags(flags, ProcessorFlags.Zero | ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry))
-                    .Output         (vars.Get<byte>("VAL8"), mapping.Output)
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input          (vars.Get<byte>("VAL8"), mapping.Input)
+                        .Add<byte, byte>(vars.Get<byte>("VAL8"), 1)
+                        .ReadFlags      (flags => registers.SetFlags(flags, ProcessorFlags.Zero | ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry))
+                        .Output         (vars.Get<byte>("VAL8"), mapping.Output))
                     .Compile();
             }
 
@@ -313,11 +323,12 @@ namespace Dame.Processor
 
             foreach (var mapping in decMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input          (vars.Get<byte>("VAL8"), mapping.Input)
-                    .Subtract<byte> (vars.Get<byte>("VAL8"), 1)
-                    .ReadFlags      (flags => registers.SetFlags(flags, ProcessorFlags.Zero | ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry))
-                    .Output         (vars.Get<byte>("VAL8"), mapping.Output)
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input          (vars.Get<byte>("VAL8"), mapping.Input)
+                        .Subtract<byte> (vars.Get<byte>("VAL8"), 1)
+                        .ReadFlags      (flags => registers.SetFlags(flags, ProcessorFlags.Zero | ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry))
+                        .Output         (vars.Get<byte>("VAL8"), mapping.Output))
                     .Compile();
             }
 
@@ -337,11 +348,12 @@ namespace Dame.Processor
 
             foreach (var mapping in addMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
-                    .Add<byte, byte>(vars.Get<byte>("VAL8"), mapping.Input)
-                    .ReadFlags      (flags => registers.SetFlags(flags))
-                    .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                        .Add<byte, byte>(vars.Get<byte>("VAL8"), mapping.Input)
+                        .ReadFlags      (flags => registers.SetFlags(flags))
+                        .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val)))
                     .Compile();
             }
 
@@ -361,12 +373,13 @@ namespace Dame.Processor
 
             foreach (var mapping in addCarryMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
-                    .WriteFlags     (() => registers.Flags)
-                    .Add<byte, byte>(vars.Get<byte>("VAL8"), mapping.Input, true)
-                    .ReadFlags      (flags => registers.SetFlags(flags))
-                    .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                        .WriteFlags     (() => registers.Flags)
+                        .Add<byte, byte>(vars.Get<byte>("VAL8"), mapping.Input, true)
+                        .ReadFlags      (flags => registers.SetFlags(flags))
+                        .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val)))
                     .Compile();
             }
 
@@ -386,11 +399,12 @@ namespace Dame.Processor
 
             foreach (var mapping in subMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
-                    .Subtract<byte> (vars.Get<byte>("VAL8"), mapping.Input)
-                    .ReadFlags      (flags => registers.SetFlags(flags))
-                    .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                        .Subtract<byte> (vars.Get<byte>("VAL8"), mapping.Input)
+                        .ReadFlags      (flags => registers.SetFlags(flags))
+                        .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val)))
                     .Compile();
             }
 
@@ -410,12 +424,13 @@ namespace Dame.Processor
 
             foreach (var mapping in subCarryMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
-                    .WriteFlags     (() => registers.Flags)
-                    .Add<byte, byte>(vars.Get<byte>("VAL8"), mapping.Input, true)
-                    .ReadFlags      (flags => registers.SetFlags(flags))
-                    .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                        .WriteFlags     (() => registers.Flags)
+                        .Add<byte, byte>(vars.Get<byte>("VAL8"), mapping.Input, true)
+                        .ReadFlags      (flags => registers.SetFlags(flags))
+                        .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val)))
                     .Compile();
             }
 
@@ -435,11 +450,12 @@ namespace Dame.Processor
 
             foreach (var mapping in andMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
-                    .And<byte>  (vars.Get<byte>("VAL8"), mapping.Input)
-                    .ReadFlags  (flags => registers.SetFlags(flags))
-                    .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                        .And<byte>  (vars.Get<byte>("VAL8"), mapping.Input)
+                        .ReadFlags  (flags => registers.SetFlags(flags))
+                        .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val)))
                     .Compile();
             }
 
@@ -459,11 +475,12 @@ namespace Dame.Processor
 
             foreach (var mapping in xorMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
-                    .Xor<byte>  (vars.Get<byte>("VAL8"), mapping.Input)
-                    .ReadFlags  (flags => registers.SetFlags(flags))
-                    .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                        .Xor<byte>  (vars.Get<byte>("VAL8"), mapping.Input)
+                        .ReadFlags  (flags => registers.SetFlags(flags))
+                        .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val)))
                     .Compile();
             }
 
@@ -483,11 +500,12 @@ namespace Dame.Processor
 
             foreach (var mapping in orMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
-                    .Or<byte>   (vars.Get<byte>("VAL8"), mapping.Input)
-                    .ReadFlags  (flags => registers.SetFlags(flags))
-                    .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                        .Or<byte>   (vars.Get<byte>("VAL8"), mapping.Input)
+                        .ReadFlags  (flags => registers.SetFlags(flags))
+                        .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val)))
                     .Compile();
             }
 
@@ -507,10 +525,11 @@ namespace Dame.Processor
 
             foreach (var mapping in cpMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, mapping.Cycles)
-                    .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
-                    .Subtract<byte> (vars.Get<byte>("VAL8"), mapping.Input)
-                    .ReadFlags      (flags => registers.SetFlags(flags))
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                        .Subtract<byte> (vars.Get<byte>("VAL8"), mapping.Input)
+                        .ReadFlags      (flags => registers.SetFlags(flags)))
                     .Compile();
             }
 
