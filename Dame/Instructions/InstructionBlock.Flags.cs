@@ -30,13 +30,25 @@ namespace Dame.Instructions
             return this;
         }
 
-        public InstructionBlock SetFlags(ProcessorFlags flag)
+        public InstructionBlock SetFlags(ProcessorFlags flags)
         {
+            expressions.Add((ExpressionGroup.Flags,
+                Expression.OrAssign(
+                    instructionContext.FlagsVariable,
+                    Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte))
+                )));
+
             return this;
         }
 
-        public InstructionBlock UnsetFlags(ProcessorFlags flag)
+        public InstructionBlock UnsetFlags(ProcessorFlags flags)
         {
+            expressions.Add((ExpressionGroup.Flags,
+                Expression.AndAssign(
+                    instructionContext.FlagsVariable,
+                    Expression.OnesComplement(Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte)))
+                )));
+                
             return this;
         }
 

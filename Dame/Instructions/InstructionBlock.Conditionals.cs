@@ -10,11 +10,18 @@ namespace Dame.Instructions
 {
     sealed partial class InstructionBlock
     {
-        public InstructionBlock IfFlagsSet(ProcessorFlags flags, Action<InstructionBlock> blockSet)
+        public InstructionBlock IfFlagsSet(ProcessorFlags flags, Action<InstructionBlock> ifTrueBlockSet, Action<InstructionBlock> ifFalseBlockSet = null)
         {
-            var ifTrueBlock = new InstructionBlock(context, instructionContext);
+            InstructionBlock ifTrueBlock, ifFalseBlock = null;
 
-            blockSet(ifTrueBlock);
+            ifTrueBlock = new InstructionBlock(context, instructionContext);
+            ifTrueBlockSet(ifTrueBlock);
+
+            if (ifFalseBlockSet != null)
+            {
+                ifFalseBlock = new InstructionBlock(context, instructionContext);
+                ifFalseBlockSet(ifFalseBlock);
+            }
 
             instructionContext.FlagsRead |= flags;
 
@@ -26,7 +33,8 @@ namespace Dame.Instructions
                     ),
                     Expression.Constant(0, typeof(byte))
                 ),
-                ifTrueBlock
+                ifTrueBlock,
+                ifFalseBlock
             )));
 
             return this;
