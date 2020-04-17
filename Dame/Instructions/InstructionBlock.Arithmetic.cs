@@ -52,7 +52,7 @@ namespace Dame.Instructions
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.AddAssign(variable, expressionResult)));
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic,
+            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
                 Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
@@ -91,7 +91,7 @@ namespace Dame.Instructions
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.SubtractAssign(variable, withCarry ? (Expression)expressionAndCarry : expressionResult)));
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic,
+            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
                 Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
@@ -114,7 +114,7 @@ namespace Dame.Instructions
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.OrAssign(variable, expressionResult)));
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic,
+            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
                 Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
@@ -137,7 +137,7 @@ namespace Dame.Instructions
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.AndAssign(variable, expressionResult)));
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic,
+            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
                 Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
@@ -160,7 +160,7 @@ namespace Dame.Instructions
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.ExclusiveOrAssign(variable, expressionResult)));
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic,
+            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
                 Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
@@ -176,6 +176,51 @@ namespace Dame.Instructions
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, true)));
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.ExclusiveOrAssign(variable, Expression.Constant(GetMaxValue<T>(), typeof(T)))));
+
+            return this;
+        }
+
+        // https://forums.nesdev.com/viewtopic.php?t=15944#p196282
+        public InstructionBlock DecimalAdjust<T>(ParameterExpression variable)
+            where T : unmanaged
+        {
+            ThrowOnUnsupportedType<T>();
+            ThrowOnVariableTypeMismatch<byte>(variable); // currently supporting only bytes
+
+            var carryFlipVariable = Expression.Variable(typeof(bool), "carryFlip");
+
+            expressions.Add((ExpressionGroup.Arithmetic, Expression.IfThenElse(
+                ReadFlag(ProcessorFlags.Arithmetic),
+                Expression.Block(
+                    Expression.IfThen(
+                        ReadFlag(ProcessorFlags.Carry),
+                        Expression.SubtractAssign(variable, Expression.Constant(0x60))
+                    ),
+                    Expression.IfThen(
+                        ReadFlag(ProcessorFlags.HalfCarry),
+                        Expression.SubtractAssign(variable, Expression.Constant(0x6))
+                    )
+                ),
+                Expression.Block(
+                    Expression.IfThen(
+                        Expression.Or(ReadFlag(ProcessorFlags.Carry), Expression.GreaterThan(variable, Expression.Constant(0x99))),
+                        Expression.Block(
+                            Expression.AddAssign(variable, Expression.Constant(0x60)),
+                            Expression.Assign(carryFlipVariable, Expression.Constant(true))
+                        )
+                    ),
+                    Expression.IfThen(
+                        Expression.Or(ReadFlag(ProcessorFlags.HalfCarry), Expression.GreaterThan(Expression.And(variable, Expression.Constant(0x0F)), Expression.Constant(0x09))),
+                        Expression.AddAssign(variable, Expression.Constant(0x6))
+                    )
+                )
+            )));
+
+            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, false)));
+            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry, carryFlipVariable)));
+
+            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
+                Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
         }

@@ -564,6 +564,16 @@ namespace Dame.Processor
                     .Compile();
             }
 
+            // DAA
+            this.opcodes[0x27] = new InstructionBuilder(0x27, "DAA", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<byte>("VAL8"), () => registers.Accumulator)
+                    .WriteFlags         (() => registers.Flags)
+                    .DecimalAdjust<byte>(vars.Get<byte>("VAL8"))
+                    .ReadFlags          (flags => registers.SetFlags(flags), ProcessorFlags.Zero | ProcessorFlags.HalfCarry | ProcessorFlags.Carry)
+                    .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val)))
+                .Compile();
+            
             #endregion
         }
     }

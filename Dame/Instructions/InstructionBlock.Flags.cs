@@ -52,5 +52,11 @@ namespace Dame.Instructions
         
         private Expression GetCarryFlagValue()
             => Expression.And(Expression.RightShift(instructionContext.FlagsVariable, Expression.Constant(4)), Expression.Constant(0x1));
+        
+        private Expression ReadFlag(ProcessorFlags flag)
+            => Expression.GreaterThan(
+                Expression.And(instructionContext.FlagsVariable, Expression.Constant(flag)),
+                Expression.Constant(1)
+            );
     }
 }
