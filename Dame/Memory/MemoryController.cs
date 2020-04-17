@@ -8,9 +8,9 @@ namespace Dame.Memory
 {
     sealed class MemoryController
     {
-        private SortedList<Range, IModifyBlock> modifyBlocks;
-        private SortedList<Range, IReadBlock> readBlocks;
-        private SortedList<Range, IWriteBlock> writeBlocks;
+        private readonly SortedList<Range, IModifyBlock> modifyBlocks = new SortedList<Range, IModifyBlock>();
+        private readonly SortedList<Range, IReadBlock> readBlocks = new SortedList<Range, IReadBlock>();
+        private readonly SortedList<Range, IWriteBlock> writeBlocks = new SortedList<Range, IWriteBlock>();
 
         public int AddressSpace { get; }
 
