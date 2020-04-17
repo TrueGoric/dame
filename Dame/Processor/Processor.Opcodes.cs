@@ -596,6 +596,7 @@ namespace Dame.Processor
                 .Compile();
             
             // CCF
+            // this could've been done better, but why waste a good opportunity to test out conditional expressions?
             this.opcodes[0x3F] = new InstructionBuilder(0x3F, "CCF", cpuContext)
                 .With(b => b
                     .WriteFlags         (() => registers.Flags)
