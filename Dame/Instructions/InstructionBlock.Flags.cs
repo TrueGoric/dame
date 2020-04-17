@@ -11,20 +11,20 @@ namespace Dame.Instructions
     {
         public InstructionBlock WriteFlags(Expression<InstructionValue<byte>> expression)
         {
-            expressions.Add((ExpressionGroup.IO, Expression.Assign(flagsVariable, expression)));
+            expressions.Add((ExpressionGroup.IO, Expression.Assign(instructionContext.FlagsVariable, expression)));
 
             return this;
         }
 
         public InstructionBlock ReadFlags(Expression<InstructionFunction<byte>> expression, ProcessorFlags mask = ProcessorFlags.All)
         {
-            flagsRead |= mask;
+            instructionContext.FlagsRead |= mask;
 
             expressions.Add((ExpressionGroup.Flags, Expression.Invoke(expression, new[]
             {
                 mask == ProcessorFlags.All
-                ? (Expression) flagsVariable
-                : (Expression) Expression.And(flagsVariable, Expression.Constant(mask, typeof(byte)))
+                ? (Expression) instructionContext.FlagsVariable
+                : (Expression) Expression.And(instructionContext.FlagsVariable, Expression.Constant(mask, typeof(byte)))
             })));
 
             return this;
@@ -42,15 +42,15 @@ namespace Dame.Instructions
 
         private Expression CreateFlagAssignExpression(ProcessorFlags flags, Expression condition)
             => Expression.IfThenElse(condition,
-                Expression.OrAssign(flagsVariable, Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte))),
-                Expression.AndAssign(flagsVariable, Expression.OnesComplement(Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte)))));
+                Expression.OrAssign(instructionContext.FlagsVariable, Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte))),
+                Expression.AndAssign(instructionContext.FlagsVariable, Expression.OnesComplement(Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte)))));
         
         private Expression CreateFlagAssignExpression(ProcessorFlags flags, bool assignment)
             => assignment
-                ? Expression.OrAssign(flagsVariable, Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte)))
-                : Expression.AndAssign(flagsVariable, Expression.OnesComplement(Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte))));
+                ? Expression.OrAssign(instructionContext.FlagsVariable, Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte)))
+                : Expression.AndAssign(instructionContext.FlagsVariable, Expression.OnesComplement(Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte))));
         
         private Expression GetCarryFlagValue()
-            => Expression.And(Expression.RightShift(flagsVariable, Expression.Constant(4)), Expression.Constant(0x1));
+            => Expression.And(Expression.RightShift(instructionContext.FlagsVariable, Expression.Constant(4)), Expression.Constant(0x1));
     }
 }

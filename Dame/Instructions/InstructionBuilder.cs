@@ -10,6 +10,25 @@ namespace Dame.Instructions
 {
     sealed class InstructionBuilder
     {
+        #region InstructionContext
+
+        private class InstructionContext : IInstructionContext
+        {
+            public ProcessorFlags FlagsRead { get; set; } = ProcessorFlags.None;
+
+            public ParameterExpression FlagsVariable { get; }
+
+            public InstructionContext()
+                : this(Expression.Variable(typeof(byte), "FLAGS"))
+            {}
+
+            public InstructionContext(ParameterExpression flagsVar)
+            {
+                FlagsVariable = flagsVar;
+            }
+        }
+
+        #endregion
         private int opcode;
         private string mnemonic;
         private readonly ProcessorExecutionContext context;
@@ -21,17 +40,18 @@ namespace Dame.Instructions
             this.opcode = opcode;
             this.mnemonic = mnemonic;
             this.context = context;
+
+            expressions = new List<(ExpressionGroup Group, Expression Expr)>();
         }
 
         public InstructionBuilder With(Action<InstructionBlock> blockSet)
         {
-            var block = new InstructionBlock(context);
+            var instructionContext = new InstructionContext();
+            var block = new InstructionBlock(context, instructionContext);
 
             blockSet(block);
 
             expressions.AddRange(block.Expressions);
-
-            // TODO: pre-optimize flags if not read
 
             return this;
         }

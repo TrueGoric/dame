@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Dame.Accessors;
 using Dame.Memory;
@@ -9,34 +10,37 @@ namespace Dame.Instructions
 {
     sealed partial class InstructionBlock
     {
-        public InstructionBlock IfFlagsSet(ProcessorFlags flags, Expression<InstructionAction> expression)
-            => IfFlagsSetInternal(flags, Expression.Invoke(expression));
-        
-        public InstructionBlock IfFlagsSet<T>(ProcessorFlags flags, ParameterExpression variable, Expression<InstructionFunction<T>> expression)
-            where T : unmanaged
+        public InstructionBlock IfFlagsSet(ProcessorFlags flags, Action<InstructionBlock> blockSet)
         {
-            ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            var ifTrueBlock = new InstructionBlock(context, instructionContext);
 
-            return IfFlagsSetInternal(flags, Expression.Invoke(expression, new[] { variable }));
-        }
+            blockSet(ifTrueBlock);
 
-        public InstructionBlock IfFlagsSetInternal(ProcessorFlags flags, Expression expression)
-        {
-            flagsRead |= flags;
+            instructionContext.FlagsRead |= flags;
 
-            expressions.Add((ExpressionGroup.Conditional, Expression.IfThen(
+            expressions.Add((ExpressionGroup.Conditional, new InstructionCondition(
                 Expression.GreaterThan(
                     Expression.And(
-                        Expression.Convert(flagsVariable, typeof(byte)),
+                        Expression.Convert(instructionContext.FlagsVariable, typeof(byte)),
                         Expression.Constant((byte)flags, typeof(byte))
                     ),
                     Expression.Constant(0, typeof(byte))
                 ),
-                expression
+                ifTrueBlock
             )));
 
             return this;
+        }
+
+        private static ConditionalExpression GenerateConditionalExpression(InstructionCondition condition)
+        {
+            if (condition.IfFalse != null)
+                return Expression.IfThenElse(condition.Condition,
+                    Expression.Block(PopulateExpressions(condition.IfTrue).Select(e => e.Expr)),
+                    Expression.Block(PopulateExpressions(condition.IfFalse).Select(e => e.Expr)));
+            else
+                return Expression.IfThen(condition.Condition,
+                    Expression.Block(PopulateExpressions(condition.IfTrue).Select(e => e.Expr)));
         }
     }
 }

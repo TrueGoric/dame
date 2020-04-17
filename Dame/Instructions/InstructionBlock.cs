@@ -10,22 +10,66 @@ namespace Dame.Instructions
 {
     sealed partial class InstructionBlock
     {
+        #region InstructionCondition class
+
+        private class InstructionCondition
+        {
+            public Expression Condition { get; set; }
+
+            public InstructionBlock IfTrue { get; set; }
+            public InstructionBlock IfFalse { get; set; }
+
+            public InstructionCondition(Expression condition, InstructionBlock ifTrue)
+            {
+                Condition = condition;
+                IfTrue = ifTrue;
+            }
+
+            public InstructionCondition(Expression condition, InstructionBlock ifTrue, InstructionBlock ifFalse)
+                : this(condition, ifTrue)
+            {
+                IfFalse = ifFalse;
+            }
+        }
+
+        #endregion
+
         private readonly ProcessorExecutionContext context;
-        
-        private List<(ExpressionGroup Group, Expression Expr)> expressions;
-        private ParameterExpression flagsVariable;
+        private readonly IInstructionContext instructionContext;
 
-        private ProcessorFlags flagsRead = ProcessorFlags.None;
+        private List<(ExpressionGroup Group, object Expr)> expressions;
 
-        public List<(ExpressionGroup Group, Expression Expr)> Expressions => expressions;
-        public ProcessorFlags FlagsRead => flagsRead;
+        public IEnumerable<(ExpressionGroup Group, Expression Expr)> Expressions => PopulateExpressions(this);
+        public ProcessorFlags FlagsRead => instructionContext.FlagsRead;
 
-        public InstructionBlock(ProcessorExecutionContext context)
+        public InstructionBlock(ProcessorExecutionContext context, IInstructionContext instructionContext)
         {
             this.context = context;
-            
-            expressions = new List<(ExpressionGroup Group, Expression Expr)>();
-            flagsVariable = Expression.Variable(typeof(byte));
+            this.instructionContext = instructionContext;
+
+            expressions = new List<(ExpressionGroup Group, object Expr)>();
+        }
+
+        private static IEnumerable<(ExpressionGroup Group, Expression Expr)> PopulateExpressions(InstructionBlock block)
+        {
+            foreach (var expr in block.expressions)
+            {
+                if (expr.Expr is InstructionBlock nestedBlock)
+                {
+                    foreach (var nestedExpr in PopulateExpressions(nestedBlock))
+                        yield return nestedExpr;
+                }
+                else if (expr.Expr is InstructionCondition nestedCondition)
+                {
+                    yield return (ExpressionGroup.Conditional, GenerateConditionalExpression(nestedCondition));
+                }
+                else if (expr.Expr is Expression nestedExpr)
+                {
+                    // TODO: pre-optimize flags if not read
+                    
+                    yield return (expr.Group, nestedExpr);
+                }
+            }
         }
 
         private void ThrowOnUnsupportedType<T>()
@@ -39,7 +83,7 @@ namespace Dame.Instructions
                     return;
 
                 default:
-                throw new NotSupportedException($"Type {typeof(T).FullName} is not supported by {nameof(InstructionBuilder)}!");
+                    throw new NotSupportedException($"Type {typeof(T).FullName} is not supported by {nameof(InstructionBuilder)}!");
             }
         }
 
