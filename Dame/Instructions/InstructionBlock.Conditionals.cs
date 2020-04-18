@@ -40,6 +40,36 @@ namespace Dame.Instructions
             return this;
         }
 
+        public InstructionBlock IfFlagsUnset(ProcessorFlags flags, Action<InstructionBlock> ifTrueBlockSet, Action<InstructionBlock> ifFalseBlockSet = null)
+        {
+            InstructionBlock ifTrueBlock, ifFalseBlock = null;
+
+            ifTrueBlock = new InstructionBlock(context, instructionContext);
+            ifTrueBlockSet(ifTrueBlock);
+
+            if (ifFalseBlockSet != null)
+            {
+                ifFalseBlock = new InstructionBlock(context, instructionContext);
+                ifFalseBlockSet(ifFalseBlock);
+            }
+
+            instructionContext.FlagsRead |= flags;
+
+            expressions.Add((ExpressionGroup.Conditional, new InstructionCondition(
+                Expression.Equal(
+                    Expression.And(
+                        Expression.Convert(instructionContext.FlagsVariable, typeof(byte)),
+                        Expression.Constant((byte)flags, typeof(byte))
+                    ),
+                    Expression.Constant((byte)0)
+                ),
+                ifTrueBlock,
+                ifFalseBlock
+            )));
+
+            return this;
+        }
+
         private static ConditionalExpression GenerateConditionalExpression(InstructionCondition condition)
         {
             if (condition.IfFalse != null)

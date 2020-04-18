@@ -67,6 +67,350 @@ namespace Dame.Processor
             
             #endregion
 
+            #region Jump instructions
+
+            var jpMappings = new Mapping<ushort>[]
+            {
+                new Mapping<ushort>(0xC3, "JP", null, null, "a16", () => assembly.ReadDouble(), inputCycles: 3),
+                new Mapping<ushort>(0xE9, "JP", null, null, "(HL)", () => registers.HL),
+            };
+
+            foreach (var mapping in jpMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input  (vars.Get<ushort>("PTR16"), mapping.Input, mapping.InputCycles)
+                        .Output (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                        .Cycle  ())
+                    .Compile();
+            }
+
+            // JR r8
+            this.opcodes[0x18] = new InstructionBuilder(0x18, "JR r8", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<ushort>("PTR16"), () => registers.SP)
+                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), () => assembly.Read().TwosComplement())
+                    .Cycle              (2)
+                    .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                    .Cycle              ())
+                .Compile();
+
+            // JP NZ, a16
+            this.opcodes[0xC2] = new InstructionBuilder(0xC2, "JP NZ, a16", cpuContext)
+                .With(b => b
+                    .Input          (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
+                    .WriteFlags     (() => registers.Flags)
+                    .IfFlagsUnset   (ProcessorFlags.Zero,
+                        t => t
+                            .Output (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                            .Cycle  ())
+                    .Cycle          ())
+                .Compile();
+            
+            // JP Z, a16
+            this.opcodes[0xCA] = new InstructionBuilder(0xCA, "JP Z, a16", cpuContext)
+                .With(b => b
+                    .Input          (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
+                    .WriteFlags     (() => registers.Flags)
+                    .IfFlagsSet     (ProcessorFlags.Zero,
+                        t => t
+                            .Output (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                            .Cycle  ())
+                    .Cycle          ())
+                .Compile();
+            
+            // JP NC, a16
+            this.opcodes[0xD2] = new InstructionBuilder(0xD2, "JP NC, a16", cpuContext)
+                .With(b => b
+                    .Input          (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
+                    .WriteFlags     (() => registers.Flags)
+                    .IfFlagsUnset   (ProcessorFlags.Carry,
+                        t => t
+                            .Output (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                            .Cycle  ())
+                    .Cycle          ())
+                .Compile();
+            
+            // JP C, a16
+            this.opcodes[0xDA] = new InstructionBuilder(0xDA, "JP C, a16", cpuContext)
+                .With(b => b
+                    .Input          (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
+                    .WriteFlags     (() => registers.Flags)
+                    .IfFlagsSet     (ProcessorFlags.Carry,
+                        t => t
+                            .Output (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                            .Cycle  ())
+                    .Cycle          ())
+                .Compile();
+            
+            // JR NZ, r8
+            this.opcodes[0x20] = new InstructionBuilder(0x20, "JR NZ, r8", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<ushort>("PTR16"), () => registers.SP)
+                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), () => assembly.Read().TwosComplement())
+                    .Cycle              ()
+                    .WriteFlags         (() => registers.Flags)
+                    .IfFlagsUnset       (ProcessorFlags.Zero,
+                        t => t
+                            .Output     (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                            .Cycle      ())
+                    .Cycle              ())
+                .Compile();
+            
+            // JR Z, r8
+            this.opcodes[0x28] = new InstructionBuilder(0x28, "JR Z, r8", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<ushort>("PTR16"), () => registers.SP)
+                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), () => assembly.Read().TwosComplement())
+                    .Cycle              ()
+                    .WriteFlags         (() => registers.Flags)
+                    .IfFlagsSet         (ProcessorFlags.Zero,
+                        t => t
+                            .Output     (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                            .Cycle      ())
+                    .Cycle              ())
+                .Compile();
+            
+            // JR NC, r8
+            this.opcodes[0x30] = new InstructionBuilder(0x30, "JR NC, r8", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<ushort>("PTR16"), () => registers.SP)
+                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), () => assembly.Read().TwosComplement())
+                    .Cycle              ()
+                    .WriteFlags         (() => registers.Flags)
+                    .IfFlagsUnset       (ProcessorFlags.Carry,
+                        t => t
+                            .Output     (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                            .Cycle      ())
+                    .Cycle              ())
+                .Compile();
+            
+            // JR C, r8
+            this.opcodes[0x38] = new InstructionBuilder(0x38, "JP C, r8", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<ushort>("PTR16"), () => registers.SP)
+                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), () => assembly.Read().TwosComplement())
+                    .Cycle              ()
+                    .WriteFlags         (() => registers.Flags)
+                    .IfFlagsSet         (ProcessorFlags.Carry,
+                        t => t
+                            .Output     (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                            .Cycle      ())
+                    .Cycle              ())
+                .Compile();
+
+            #endregion
+
+            #region Call instructions
+            
+            // CALL a16
+            this.opcodes[0xCD] = new InstructionBuilder(0xCD, "CALL a16", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
+                    // SP -= 2
+                    .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                    .Subtract<ushort>   (vars.Get<ushort>("STACK16"), 2)
+                    .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                    .Cycle              ()
+                    // (SP) = PC
+                    .Input              (vars.Get<ushort>("COUNTER16"), () => registers.PC)
+                    .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => memoryController.WriteDouble(registers.SP, val), 2)
+                    // PC = a16
+                    .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                    .Cycle              ())
+                .Compile();
+            
+            // CALL NZ, a16
+            this.opcodes[0xC4] = new InstructionBuilder(0xC4, "CALL NZ, a16", cpuContext)
+                .With(b => b
+                    .Input                      (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
+                    .IfFlagsUnset               (ProcessorFlags.Zero,
+                        t => t
+                            // SP -= 2
+                            .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                            .Subtract<ushort>   (vars.Get<ushort>("STACK16"), 2)
+                            .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                            .Cycle              ()
+                            // (SP) = PC
+                            .Input              (vars.Get<ushort>("COUNTER16"), () => registers.PC)
+                            .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => memoryController.WriteDouble(registers.SP, val), 2)
+                            // PC = a16
+                            .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val)))
+                    .Cycle                      ())
+                .Compile();
+            
+            // CALL Z, a16
+            this.opcodes[0xCC] = new InstructionBuilder(0xCC, "CALL Z, a16", cpuContext)
+                .With(b => b
+                    .Input                      (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
+                    .IfFlagsSet                 (ProcessorFlags.Zero,
+                        t => t
+                            // SP -= 2
+                            .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                            .Subtract<ushort>   (vars.Get<ushort>("STACK16"), 2)
+                            .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                            .Cycle              ()
+                            // (SP) = PC
+                            .Input              (vars.Get<ushort>("COUNTER16"), () => registers.PC)
+                            .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => memoryController.WriteDouble(registers.SP, val), 2)
+                            // PC = a16
+                            .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val)))
+                    .Cycle                      ())
+                .Compile();
+            
+            // CALL NC, a16
+            this.opcodes[0xD4] = new InstructionBuilder(0xD4, "CALL NC, a16", cpuContext)
+                .With(b => b
+                    .Input                      (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
+                    .IfFlagsUnset               (ProcessorFlags.Carry,
+                        t => t
+                            // SP -= 2
+                            .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                            .Subtract<ushort>   (vars.Get<ushort>("STACK16"), 2)
+                            .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                            .Cycle              ()
+                            // (SP) = PC
+                            .Input              (vars.Get<ushort>("COUNTER16"), () => registers.PC)
+                            .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => memoryController.WriteDouble(registers.SP, val), 2)
+                            // PC = a16
+                            .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val)))
+                    .Cycle                      ())
+                .Compile();
+            
+            // CALL C, a16
+            this.opcodes[0xDC] = new InstructionBuilder(0xDC, "CALL C, a16", cpuContext)
+                .With(b => b
+                    .Input                      (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
+                    .IfFlagsSet                 (ProcessorFlags.Carry,
+                        t => t
+                            // SP -= 2
+                            .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                            .Subtract<ushort>   (vars.Get<ushort>("STACK16"), 2)
+                            .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                            .Cycle              ()
+                            // (SP) = PC
+                            .Input              (vars.Get<ushort>("COUNTER16"), () => registers.PC)
+                            .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => memoryController.WriteDouble(registers.SP, val), 2)
+                            // PC = a16
+                            .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val)))
+                    .Cycle                      ())
+                .Compile();
+
+            // RET
+            this.opcodes[0xC9] = new InstructionBuilder(0xC9, "RET", cpuContext)
+                .With(b => b
+                    // PC = (SP)
+                    .Input              (vars.Get<ushort>("COUNTER16"), () => memoryController.ReadDouble(registers.SP), 2)
+                    .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => registers.SetPC(val))
+                    // SP += 2
+                    .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                    .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
+                    .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                    .Cycle              (2))
+                .Compile();
+            
+            // RET NZ
+            this.opcodes[0xC0] = new InstructionBuilder(0xC0, "RET NZ", cpuContext)
+                .With(b => b
+                    .WriteFlags                 (() => registers.Flags)
+                    .IfFlagsUnset               (ProcessorFlags.Zero,
+                        t => t
+                            // PC = (SP)
+                            .Input              (vars.Get<ushort>("COUNTER16"), () => memoryController.ReadDouble(registers.SP), 2)
+                            .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => registers.SetPC(val))
+                            // SP += 2
+                            .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                            .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
+                            .Cycle              ()
+                            .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val)))
+                    .Cycle                      (2))
+                .Compile();
+            
+            // RET Z
+            this.opcodes[0xC8] = new InstructionBuilder(0xC8, "RET Z", cpuContext)
+                .With(b => b
+                    .WriteFlags                 (() => registers.Flags)
+                    .IfFlagsSet                 (ProcessorFlags.Zero,
+                        t => t
+                            // PC = (SP)
+                            .Input              (vars.Get<ushort>("COUNTER16"), () => memoryController.ReadDouble(registers.SP), 2)
+                            .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => registers.SetPC(val))
+                            // SP += 2
+                            .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                            .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
+                            .Cycle              ()
+                            .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val)))
+                    .Cycle                      (2))
+                .Compile();
+
+            // RET NC
+            this.opcodes[0xD0] = new InstructionBuilder(0xD0, "RET NC", cpuContext)
+                .With(b => b
+                    .WriteFlags                 (() => registers.Flags)
+                    .IfFlagsUnset               (ProcessorFlags.Carry,
+                        t => t
+                            // PC = (SP)
+                            .Input              (vars.Get<ushort>("COUNTER16"), () => memoryController.ReadDouble(registers.SP), 2)
+                            .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => registers.SetPC(val))
+                            // SP += 2
+                            .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                            .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
+                            .Cycle              ()
+                            .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val)))
+                    .Cycle                      (2))
+                .Compile();
+            
+            // RET C
+            this.opcodes[0xD8] = new InstructionBuilder(0xD8, "RET C", cpuContext)
+                .With(b => b
+                    .WriteFlags                 (() => registers.Flags)
+                    .IfFlagsSet                 (ProcessorFlags.Carry,
+                        t => t
+                            // PC = (SP)
+                            .Input              (vars.Get<ushort>("COUNTER16"), () => memoryController.ReadDouble(registers.SP), 2)
+                            .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => registers.SetPC(val))
+                            // SP += 2
+                            .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                            .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
+                            .Cycle              ()
+                            .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val)))
+                    .Cycle                      (2))
+                .Compile();
+
+            var rstMappings = new Mapping<ushort>[]
+            {
+                new Mapping<ushort>(0xC7, "RST", null, null, "00H", () => 0x00),
+                new Mapping<ushort>(0xD7, "RST", null, null, "10H", () => 0x10),
+                new Mapping<ushort>(0xE7, "RST", null, null, "20H", () => 0x20),
+                new Mapping<ushort>(0xF7, "RST", null, null, "30H", () => 0x30),
+
+                new Mapping<ushort>(0xCF, "RST", null, null, "08H", () => 0x08),
+                new Mapping<ushort>(0xDF, "RST", null, null, "18H", () => 0x18),
+                new Mapping<ushort>(0xEF, "RST", null, null, "28H", () => 0x28),
+                new Mapping<ushort>(0xFF, "RST", null, null, "38H", () => 0x38),
+            };
+
+            foreach (var mapping in rstMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<ushort>("PTR16"), mapping.Input)
+                        // SP -= 2
+                        .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                        .Subtract<ushort>   (vars.Get<ushort>("STACK16"), 2)
+                        .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                        .Cycle              ()
+                        // (SP) = PC
+                        .Input              (vars.Get<ushort>("COUNTER16"), () => registers.PC)
+                        .Output             (vars.Get<ushort>("COUNTER16"), (ushort val) => memoryController.WriteDouble(registers.SP, val), 2)
+                        // PC = a16
+                        .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
+                        .Cycle              ())
+                .Compile();
+            }
+
+            #endregion
+
             #region 8-bit loads
 
             // TODO: maybe use alternative mnemonics?

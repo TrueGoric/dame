@@ -94,8 +94,10 @@ namespace Dame.Instructions
                 {
                     foreach (var nestedVariable in PopulateVariables(nestedCondition.IfTrue))
                         yield return nestedVariable;
-                    foreach (var nestedVariable in PopulateVariables(nestedCondition.IfFalse))
-                        yield return nestedVariable;
+
+                    if (nestedCondition.IfFalse != null)
+                        foreach (var nestedVariable in PopulateVariables(nestedCondition.IfFalse))
+                            yield return nestedVariable;
                 }
             }
         }
