@@ -71,12 +71,14 @@ namespace Dame.Instructions
             var statements = expressions
                 .Select(e => e.Expr);
 
-            var @delegate = Expression.Lambda<InstructionDelegate>(
+            var prefab = Expression.Lambda<InstructionDelegate>(
                 Expression.Block(
                     variables,
                     statements
-                )
-            )
+                ), mnemonic, null
+            );
+
+            var @delegate = prefab
 #if DEBUG
             .Compile();
 #else
