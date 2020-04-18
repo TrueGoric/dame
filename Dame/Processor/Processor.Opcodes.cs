@@ -926,6 +926,259 @@ namespace Dame.Processor
             }
 
             #endregion
+
+            #region Bit operations
+
+            var testMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(0xCB_40, "BIT", "0", null, "B", () => registers.B),
+                new Mapping<byte>(0xCB_41, "BIT", "0", null, "C", () => registers.C),
+                new Mapping<byte>(0xCB_42, "BIT", "0", null, "D", () => registers.D),
+                new Mapping<byte>(0xCB_43, "BIT", "0", null, "E", () => registers.E),
+                new Mapping<byte>(0xCB_44, "BIT", "0", null, "H", () => registers.H),
+                new Mapping<byte>(0xCB_45, "BIT", "0", null, "L", () => registers.L),
+                new Mapping<byte>(0xCB_46, "BIT", "0", null, "(HL)", () => memoryController.Read(registers.HL), inputCycles: 2),
+                new Mapping<byte>(0xCB_47, "BIT", "0", null, "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_48, "BIT", "1", null, "B", () => registers.B),
+                new Mapping<byte>(0xCB_49, "BIT", "1", null, "C", () => registers.C),
+                new Mapping<byte>(0xCB_4A, "BIT", "1", null, "D", () => registers.D),
+                new Mapping<byte>(0xCB_4B, "BIT", "1", null, "E", () => registers.E),
+                new Mapping<byte>(0xCB_4C, "BIT", "1", null, "H", () => registers.H),
+                new Mapping<byte>(0xCB_4D, "BIT", "1", null, "L", () => registers.L),
+                new Mapping<byte>(0xCB_4E, "BIT", "1", null, "(HL)", () => memoryController.Read(registers.HL), inputCycles: 2),
+                new Mapping<byte>(0xCB_4F, "BIT", "1", null, "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_50, "BIT", "2", null, "B", () => registers.B),
+                new Mapping<byte>(0xCB_51, "BIT", "2", null, "C", () => registers.C),
+                new Mapping<byte>(0xCB_52, "BIT", "2", null, "D", () => registers.D),
+                new Mapping<byte>(0xCB_53, "BIT", "2", null, "E", () => registers.E),
+                new Mapping<byte>(0xCB_54, "BIT", "2", null, "H", () => registers.H),
+                new Mapping<byte>(0xCB_55, "BIT", "2", null, "L", () => registers.L),
+                new Mapping<byte>(0xCB_56, "BIT", "2", null, "(HL)", () => memoryController.Read(registers.HL), inputCycles: 2),
+                new Mapping<byte>(0xCB_57, "BIT", "2", null, "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_58, "BIT", "3", null, "B", () => registers.B),
+                new Mapping<byte>(0xCB_59, "BIT", "3", null, "C", () => registers.C),
+                new Mapping<byte>(0xCB_5A, "BIT", "3", null, "D", () => registers.D),
+                new Mapping<byte>(0xCB_5B, "BIT", "3", null, "E", () => registers.E),
+                new Mapping<byte>(0xCB_5C, "BIT", "3", null, "H", () => registers.H),
+                new Mapping<byte>(0xCB_5D, "BIT", "3", null, "L", () => registers.L),
+                new Mapping<byte>(0xCB_5E, "BIT", "3", null, "(HL)", () => memoryController.Read(registers.HL), inputCycles: 2),
+                new Mapping<byte>(0xCB_5F, "BIT", "3", null, "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_60, "BIT", "4", null, "B", () => registers.B),
+                new Mapping<byte>(0xCB_61, "BIT", "4", null, "C", () => registers.C),
+                new Mapping<byte>(0xCB_62, "BIT", "4", null, "D", () => registers.D),
+                new Mapping<byte>(0xCB_63, "BIT", "4", null, "E", () => registers.E),
+                new Mapping<byte>(0xCB_64, "BIT", "4", null, "H", () => registers.H),
+                new Mapping<byte>(0xCB_65, "BIT", "4", null, "L", () => registers.L),
+                new Mapping<byte>(0xCB_66, "BIT", "4", null, "(HL)", () => memoryController.Read(registers.HL), inputCycles: 2),
+                new Mapping<byte>(0xCB_67, "BIT", "4", null, "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_68, "BIT", "5", null, "B", () => registers.B),
+                new Mapping<byte>(0xCB_69, "BIT", "5", null, "C", () => registers.C),
+                new Mapping<byte>(0xCB_6A, "BIT", "5", null, "D", () => registers.D),
+                new Mapping<byte>(0xCB_6B, "BIT", "5", null, "E", () => registers.E),
+                new Mapping<byte>(0xCB_6C, "BIT", "5", null, "H", () => registers.H),
+                new Mapping<byte>(0xCB_6D, "BIT", "5", null, "L", () => registers.L),
+                new Mapping<byte>(0xCB_6E, "BIT", "5", null, "(HL)", () => memoryController.Read(registers.HL), inputCycles: 2),
+                new Mapping<byte>(0xCB_6F, "BIT", "5", null, "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_70, "BIT", "6", null, "B", () => registers.B),
+                new Mapping<byte>(0xCB_71, "BIT", "6", null, "C", () => registers.C),
+                new Mapping<byte>(0xCB_72, "BIT", "6", null, "D", () => registers.D),
+                new Mapping<byte>(0xCB_73, "BIT", "6", null, "E", () => registers.E),
+                new Mapping<byte>(0xCB_74, "BIT", "6", null, "H", () => registers.H),
+                new Mapping<byte>(0xCB_75, "BIT", "6", null, "L", () => registers.L),
+                new Mapping<byte>(0xCB_76, "BIT", "6", null, "(HL)", () => memoryController.Read(registers.HL), inputCycles: 2),
+                new Mapping<byte>(0xCB_77, "BIT", "6", null, "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_78, "BIT", "7", null, "B", () => registers.B),
+                new Mapping<byte>(0xCB_79, "BIT", "7", null, "C", () => registers.C),
+                new Mapping<byte>(0xCB_7A, "BIT", "7", null, "D", () => registers.D),
+                new Mapping<byte>(0xCB_7B, "BIT", "7", null, "E", () => registers.E),
+                new Mapping<byte>(0xCB_7C, "BIT", "7", null, "H", () => registers.H),
+                new Mapping<byte>(0xCB_7D, "BIT", "7", null, "L", () => registers.L),
+                new Mapping<byte>(0xCB_7E, "BIT", "7", null, "(HL)", () => memoryController.Read(registers.HL), inputCycles: 2),
+                new Mapping<byte>(0xCB_7F, "BIT", "7", null, "A", () => registers.A),
+            };
+
+            foreach (var mapping in testMappings)
+            {
+                var bit = (mapping.Opcode - 0xCB_40) / 8;
+
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input          (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .TestBit<byte>  (vars.Get<byte>("VAL8"), bit)
+                        .ReadFlags      (flags => registers.SetFlags(flags, ProcessorFlags.All ^ ProcessorFlags.Carry))
+                        .Cycle          (2))
+                    .Compile();
+            }
+
+            var setBitMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(0xCB_80, "RES", "0", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_81, "RES", "0", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_82, "RES", "0", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_83, "RES", "0", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_84, "RES", "0", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_85, "RES", "0", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_86, "RES", "0", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_87, "RES", "0", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_88, "RES", "1", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_89, "RES", "1", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_8A, "RES", "1", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_8B, "RES", "1", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_8C, "RES", "1", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_8D, "RES", "1", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_8E, "RES", "1", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_8F, "RES", "1", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_90, "RES", "2", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_91, "RES", "2", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_92, "RES", "2", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_93, "RES", "2", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_94, "RES", "2", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_95, "RES", "2", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_96, "RES", "2", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_97, "RES", "2", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_98, "RES", "3", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_99, "RES", "3", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_9A, "RES", "3", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_9B, "RES", "3", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_9C, "RES", "3", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_9D, "RES", "3", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_9E, "RES", "3", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_9F, "RES", "3", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_A0, "RES", "4", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_A1, "RES", "4", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_A2, "RES", "4", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_A3, "RES", "4", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_A4, "RES", "4", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_A5, "RES", "4", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_A6, "RES", "4", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_A7, "RES", "4", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_A8, "RES", "5", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_A9, "RES", "5", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_AA, "RES", "5", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_AB, "RES", "5", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_AC, "RES", "5", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_AD, "RES", "5", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_AE, "RES", "5", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_AF, "RES", "5", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_B0, "RES", "6", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_B1, "RES", "6", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_B2, "RES", "6", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_B3, "RES", "6", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_B4, "RES", "6", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_B5, "RES", "6", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_B6, "RES", "6", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_B7, "RES", "6", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_B8, "RES", "7", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_B9, "RES", "7", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_BA, "RES", "7", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_BB, "RES", "7", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_BC, "RES", "7", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_BD, "RES", "7", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_BE, "RES", "7", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_BF, "RES", "7", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_C0, "SET", "0", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_C1, "SET", "0", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_C2, "SET", "0", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_C3, "SET", "0", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_C4, "SET", "0", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_C5, "SET", "0", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_C6, "SET", "0", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_C7, "SET", "0", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_C8, "SET", "1", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_C9, "SET", "1", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_CA, "SET", "1", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_CB, "SET", "1", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_CC, "SET", "1", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_CD, "SET", "1", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_CE, "SET", "1", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_CF, "SET", "1", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_D0, "SET", "2", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_D1, "SET", "2", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_D2, "SET", "2", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_D3, "SET", "2", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_D4, "SET", "2", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_D5, "SET", "2", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_D6, "SET", "2", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_D7, "SET", "2", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_D8, "SET", "3", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_D9, "SET", "3", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_DA, "SET", "3", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_DB, "SET", "3", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_DC, "SET", "3", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_DD, "SET", "3", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_DE, "SET", "3", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_DF, "SET", "3", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_E0, "SET", "4", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_E1, "SET", "4", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_E2, "SET", "4", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_E3, "SET", "4", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_E4, "SET", "4", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_E5, "SET", "4", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_E6, "SET", "4", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_E7, "SET", "4", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_E8, "SET", "5", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_E9, "SET", "5", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_EA, "SET", "5", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_EB, "SET", "5", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_EC, "SET", "5", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_ED, "SET", "5", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_EE, "SET", "5", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_EF, "SET", "5", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_F0, "SET", "6", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_F1, "SET", "6", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_F2, "SET", "6", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_F3, "SET", "6", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_F4, "SET", "6", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_F5, "SET", "6", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_F6, "SET", "6", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_F7, "SET", "6", val => registers.SetA(val), "A", () => registers.A),
+
+                new Mapping<byte>(0xCB_F8, "SET", "7", val => registers.SetB(val), "B", () => registers.B),
+                new Mapping<byte>(0xCB_F9, "SET", "7", val => registers.SetC(val), "C", () => registers.C),
+                new Mapping<byte>(0xCB_FA, "SET", "7", val => registers.SetD(val), "D", () => registers.D),
+                new Mapping<byte>(0xCB_FB, "SET", "7", val => registers.SetE(val), "E", () => registers.E),
+                new Mapping<byte>(0xCB_FC, "SET", "7", val => registers.SetH(val), "H", () => registers.H),
+                new Mapping<byte>(0xCB_FD, "SET", "7", val => registers.SetL(val), "L", () => registers.L),
+                new Mapping<byte>(0xCB_FE, "SET", "7", val => memoryController.Write(registers.HL, val), "(HL)", () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_FF, "SET", "7", val => registers.SetA(val), "A", () => registers.A),
+            };
+
+            foreach (var mapping in testMappings)
+            {
+                var bit = ((mapping.Opcode - 0xCB_80) / 8) % 8;
+                var value = mapping.Opcode > 0xCB_BF;
+
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input          (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .SetBit<byte>   (vars.Get<byte>("VAL8"), bit, value)
+                        .Output         (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
+                        .Cycle          (2))
+                    .Compile();
+            }
+
+            #endregion
         }
     }
 }

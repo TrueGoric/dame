@@ -7,6 +7,7 @@ namespace Dame.Instructions
         Flags,
         Arithmetic,
         Conditional,
-        Shift
+        Shift,
+        Bit
     }
 }
