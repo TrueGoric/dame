@@ -686,6 +686,58 @@ namespace Dame.Processor
                     .Compile();
 
             #endregion
+
+            #region Shifts
+
+            var rlcMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(0xCB_00, "RLC", "B",  val => registers.SetB(val), null, () => registers.B),
+                new Mapping<byte>(0xCB_01, "RLC", "C",  val => registers.SetC(val), null, () => registers.C),
+                new Mapping<byte>(0xCB_02, "RLC", "D",  val => registers.SetD(val), null, () => registers.D),
+                new Mapping<byte>(0xCB_03, "RLC", "E",  val => registers.SetE(val), null, () => registers.E),
+                new Mapping<byte>(0xCB_04, "RLC", "H",  val => registers.SetH(val), null, () => registers.H),
+                new Mapping<byte>(0xCB_05, "RLC", "L",  val => registers.SetL(val), null, () => registers.L),
+                new Mapping<byte>(0xCB_06, "RLC", "(HL)", val => memoryController.Write(registers.HL, val), null, () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_07, "RLC", "A",  val => registers.SetA(val), null, () => registers.A),
+            };
+
+            foreach (var mapping in rlcMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .RotateLeft<byte>   (vars.Get<byte>("VAL8"), true)
+                        .ReadFlags          (flags => registers.SetFlags(flags))
+                        .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
+                        .Cycle              (2))
+                    .Compile();
+            }
+
+            var swapMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(0xCB_30, "SWAP", "B",  val => registers.SetB(val), null, () => registers.B),
+                new Mapping<byte>(0xCB_31, "SWAP", "C",  val => registers.SetC(val), null, () => registers.C),
+                new Mapping<byte>(0xCB_32, "SWAP", "D",  val => registers.SetD(val), null, () => registers.D),
+                new Mapping<byte>(0xCB_33, "SWAP", "E",  val => registers.SetE(val), null, () => registers.E),
+                new Mapping<byte>(0xCB_34, "SWAP", "H",  val => registers.SetH(val), null, () => registers.H),
+                new Mapping<byte>(0xCB_35, "SWAP", "L",  val => registers.SetL(val), null, () => registers.L),
+                new Mapping<byte>(0xCB_36, "SWAP", "(HL)", val => memoryController.Write(registers.HL, val), null, () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_37, "SWAP", "A",  val => registers.SetA(val), null, () => registers.A),
+            };
+
+            foreach (var mapping in swapMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input      (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .Swap<byte> (vars.Get<byte>("VAL8"))
+                        .ReadFlags  (flags => registers.SetFlags(flags))
+                        .Output     (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
+                        .Cycle      (2))
+                    .Compile();
+            }
+
+            #endregion
         }
     }
 }
