@@ -570,7 +570,7 @@ namespace Dame.Processor
                     .Input              (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                     .WriteFlags         (() => registers.Flags)
                     .DecimalAdjust<byte>(vars.Get<byte>("VAL8"))
-                    .ReadFlags          (flags => registers.SetFlags(flags), ProcessorFlags.Zero | ProcessorFlags.HalfCarry | ProcessorFlags.Carry)
+                    .ReadFlags          (flags => registers.SetFlags(flags, ProcessorFlags.Zero | ProcessorFlags.HalfCarry | ProcessorFlags.Carry))
                     .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                     .Cycle              ())
                 .Compile();
@@ -581,7 +581,7 @@ namespace Dame.Processor
                     .Input              (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                     .WriteFlags         (() => registers.Flags)
                     .Complement<byte>   (vars.Get<byte>("VAL8"))
-                    .ReadFlags          (flags => registers.SetFlags(flags), ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry)
+                    .ReadFlags          (flags => registers.SetFlags(flags, ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry))
                     .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                     .Cycle              ())
                 .Compile();
@@ -591,7 +591,7 @@ namespace Dame.Processor
                 .With(b => b
                     .WriteFlags         (() => registers.Flags)
                     .SetFlags           (ProcessorFlags.Carry)
-                    .ReadFlags          (flags => registers.SetFlags(flags), ProcessorFlags.Carry)
+                    .ReadFlags          (flags => registers.SetFlags(flags, ProcessorFlags.Carry))
                     .Cycle              ())
                 .Compile();
             
@@ -606,7 +606,7 @@ namespace Dame.Processor
                         f => f
                             .SetFlags   (ProcessorFlags.Carry))
                     .UnsetFlags         (ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry)
-                    .ReadFlags          (flags => registers.SetFlags(flags), ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry | ProcessorFlags.Carry)
+                    .ReadFlags          (flags => registers.SetFlags(flags, ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry | ProcessorFlags.Carry))
                     .Cycle              ())
                 .Compile();
 
