@@ -58,6 +58,15 @@ namespace Dame.Processor
         {
             var vars = new InstructionVariableManager();
 
+            #region Control instructions
+
+            this.opcodes[0x00] = new InstructionBuilder(0x00, "NOP", cpuContext)
+                .With(b => b
+                    .Cycle  ())
+                .Compile();
+            
+            #endregion
+
             #region 8-bit loads
 
             // TODO: maybe use alternative mnemonics?
