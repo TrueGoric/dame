@@ -689,6 +689,17 @@ namespace Dame.Processor
 
             #region Shifts
 
+            // RLCA
+            this.opcodes[0x07] = new InstructionBuilder(0x07, "RLCA", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<byte>("VAL8"), () => registers.A)
+                    .RotateLeft<byte>   (vars.Get<byte>("VAL8"), true)
+                    .UnsetFlags         (ProcessorFlags.Zero)
+                    .ReadFlags          (flags => registers.SetFlags(flags))
+                    .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
+                    .Cycle              ())
+                .Compile();
+
             var rlcMappings = new Mapping<byte>[]
             {
                 new Mapping<byte>(0xCB_00, "RLC", "B",  val => registers.SetB(val), null, () => registers.B),
@@ -707,6 +718,159 @@ namespace Dame.Processor
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .RotateLeft<byte>   (vars.Get<byte>("VAL8"), true)
+                        .ReadFlags          (flags => registers.SetFlags(flags))
+                        .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
+                        .Cycle              (2))
+                    .Compile();
+            }
+
+            // RRCA
+            this.opcodes[0x0F] = new InstructionBuilder(0x0F, "RRCA", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<byte>("VAL8"), () => registers.A)
+                    .RotateRight<byte>  (vars.Get<byte>("VAL8"), true)
+                    .UnsetFlags         (ProcessorFlags.Zero)
+                    .ReadFlags          (flags => registers.SetFlags(flags))
+                    .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
+                    .Cycle              ())
+                .Compile();
+
+            var rrcMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(0xCB_08, "RRC", "B",  val => registers.SetB(val), null, () => registers.B),
+                new Mapping<byte>(0xCB_09, "RRC", "C",  val => registers.SetC(val), null, () => registers.C),
+                new Mapping<byte>(0xCB_0A, "RRC", "D",  val => registers.SetD(val), null, () => registers.D),
+                new Mapping<byte>(0xCB_0B, "RRC", "E",  val => registers.SetE(val), null, () => registers.E),
+                new Mapping<byte>(0xCB_0C, "RRC", "H",  val => registers.SetH(val), null, () => registers.H),
+                new Mapping<byte>(0xCB_0D, "RRC", "L",  val => registers.SetL(val), null, () => registers.L),
+                new Mapping<byte>(0xCB_0E, "RRC", "(HL)", val => memoryController.Write(registers.HL, val), null, () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_0F, "RRC", "A",  val => registers.SetA(val), null, () => registers.A),
+            };
+
+            foreach (var mapping in rrcMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .RotateRight<byte>  (vars.Get<byte>("VAL8"), true)
+                        .ReadFlags          (flags => registers.SetFlags(flags))
+                        .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
+                        .Cycle              (2))
+                    .Compile();
+            }
+
+            // RLA
+            this.opcodes[0x17] = new InstructionBuilder(0x17, "RLA", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<byte>("VAL8"), () => registers.A)
+                    .RotateLeft<byte>   (vars.Get<byte>("VAL8"), false)
+                    .UnsetFlags         (ProcessorFlags.Zero)
+                    .ReadFlags          (flags => registers.SetFlags(flags))
+                    .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
+                    .Cycle              ())
+                .Compile();
+
+            var rlMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(0xCB_10, "RL", "B",  val => registers.SetB(val), null, () => registers.B),
+                new Mapping<byte>(0xCB_11, "RL", "C",  val => registers.SetC(val), null, () => registers.C),
+                new Mapping<byte>(0xCB_12, "RL", "D",  val => registers.SetD(val), null, () => registers.D),
+                new Mapping<byte>(0xCB_13, "RL", "E",  val => registers.SetE(val), null, () => registers.E),
+                new Mapping<byte>(0xCB_14, "RL", "H",  val => registers.SetH(val), null, () => registers.H),
+                new Mapping<byte>(0xCB_15, "RL", "L",  val => registers.SetL(val), null, () => registers.L),
+                new Mapping<byte>(0xCB_16, "RL", "(HL)", val => memoryController.Write(registers.HL, val), null, () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_17, "RL", "A",  val => registers.SetA(val), null, () => registers.A),
+            };
+
+            foreach (var mapping in rlMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .RotateLeft<byte>   (vars.Get<byte>("VAL8"), false)
+                        .ReadFlags          (flags => registers.SetFlags(flags))
+                        .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
+                        .Cycle              (2))
+                    .Compile();
+            }
+
+            // RRA
+            this.opcodes[0x1F] = new InstructionBuilder(0x1F, "RRCA", cpuContext)
+                .With(b => b
+                    .Input              (vars.Get<byte>("VAL8"), () => registers.A)
+                    .RotateRight<byte>  (vars.Get<byte>("VAL8"), false)
+                    .UnsetFlags         (ProcessorFlags.Zero)
+                    .ReadFlags          (flags => registers.SetFlags(flags))
+                    .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
+                    .Cycle              ())
+                .Compile();
+
+            var rrMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(0xCB_18, "RR", "B",  val => registers.SetB(val), null, () => registers.B),
+                new Mapping<byte>(0xCB_19, "RR", "C",  val => registers.SetC(val), null, () => registers.C),
+                new Mapping<byte>(0xCB_1A, "RR", "D",  val => registers.SetD(val), null, () => registers.D),
+                new Mapping<byte>(0xCB_1B, "RR", "E",  val => registers.SetE(val), null, () => registers.E),
+                new Mapping<byte>(0xCB_1C, "RR", "H",  val => registers.SetH(val), null, () => registers.H),
+                new Mapping<byte>(0xCB_1D, "RR", "L",  val => registers.SetL(val), null, () => registers.L),
+                new Mapping<byte>(0xCB_1E, "RR", "(HL)", val => memoryController.Write(registers.HL, val), null, () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_1F, "RR", "A",  val => registers.SetA(val), null, () => registers.A),
+            };
+
+            foreach (var mapping in rrMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .RotateRight<byte>  (vars.Get<byte>("VAL8"), false)
+                        .ReadFlags          (flags => registers.SetFlags(flags))
+                        .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
+                        .Cycle              (2))
+                    .Compile();
+            }
+
+            var slaMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(0xCB_20, "SLA", "B",  val => registers.SetB(val), null, () => registers.B),
+                new Mapping<byte>(0xCB_21, "SLA", "C",  val => registers.SetC(val), null, () => registers.C),
+                new Mapping<byte>(0xCB_22, "SLA", "D",  val => registers.SetD(val), null, () => registers.D),
+                new Mapping<byte>(0xCB_23, "SLA", "E",  val => registers.SetE(val), null, () => registers.E),
+                new Mapping<byte>(0xCB_24, "SLA", "H",  val => registers.SetH(val), null, () => registers.H),
+                new Mapping<byte>(0xCB_25, "SLA", "L",  val => registers.SetL(val), null, () => registers.L),
+                new Mapping<byte>(0xCB_26, "SLA", "(HL)", val => memoryController.Write(registers.HL, val), null, () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_27, "SLA", "A",  val => registers.SetA(val), null, () => registers.A),
+            };
+
+            foreach (var mapping in slaMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .ShiftLeft<byte>    (vars.Get<byte>("VAL8"), false)
+                        .ReadFlags          (flags => registers.SetFlags(flags))
+                        .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
+                        .Cycle              (2))
+                    .Compile();
+            }
+
+            var sraMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(0xCB_28, "SRA", "B",  val => registers.SetB(val), null, () => registers.B),
+                new Mapping<byte>(0xCB_29, "SRA", "C",  val => registers.SetC(val), null, () => registers.C),
+                new Mapping<byte>(0xCB_2A, "SRA", "D",  val => registers.SetD(val), null, () => registers.D),
+                new Mapping<byte>(0xCB_2B, "SRA", "E",  val => registers.SetE(val), null, () => registers.E),
+                new Mapping<byte>(0xCB_2C, "SRA", "H",  val => registers.SetH(val), null, () => registers.H),
+                new Mapping<byte>(0xCB_2D, "SRA", "L",  val => registers.SetL(val), null, () => registers.L),
+                new Mapping<byte>(0xCB_2E, "SRA", "(HL)", val => memoryController.Write(registers.HL, val), null, () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_2F, "SRA", "A",  val => registers.SetA(val), null, () => registers.A),
+            };
+
+            foreach (var mapping in sraMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .ShiftRight<byte>   (vars.Get<byte>("VAL8"), true)
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle              (2))
@@ -734,6 +898,30 @@ namespace Dame.Processor
                         .ReadFlags  (flags => registers.SetFlags(flags))
                         .Output     (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle      (2))
+                    .Compile();
+            }
+
+            var srlMappings = new Mapping<byte>[]
+            {
+                new Mapping<byte>(0xCB_38, "SRL", "B",  val => registers.SetB(val), null, () => registers.B),
+                new Mapping<byte>(0xCB_39, "SRL", "C",  val => registers.SetC(val), null, () => registers.C),
+                new Mapping<byte>(0xCB_3A, "SRL", "D",  val => registers.SetD(val), null, () => registers.D),
+                new Mapping<byte>(0xCB_3B, "SRL", "E",  val => registers.SetE(val), null, () => registers.E),
+                new Mapping<byte>(0xCB_3C, "SRL", "H",  val => registers.SetH(val), null, () => registers.H),
+                new Mapping<byte>(0xCB_3D, "SRL", "L",  val => registers.SetL(val), null, () => registers.L),
+                new Mapping<byte>(0xCB_3E, "SRL", "(HL)", val => memoryController.Write(registers.HL, val), null, () => memoryController.Read(registers.HL), inputCycles: 1, outputCycles: 1),
+                new Mapping<byte>(0xCB_3F, "SRL", "A",  val => registers.SetA(val), null, () => registers.A),
+            };
+
+            foreach (var mapping in srlMappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .ShiftRight<byte>   (vars.Get<byte>("VAL8"), false)
+                        .ReadFlags          (flags => registers.SetFlags(flags))
+                        .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
+                        .Cycle              (2))
                     .Compile();
             }
 
