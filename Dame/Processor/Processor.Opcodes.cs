@@ -611,6 +611,81 @@ namespace Dame.Processor
                 .Compile();
 
             #endregion
+
+            #region 16-bit airthmetic
+
+            var inc16Mappings = new Mapping<ushort>[]
+            {
+                new Mapping<ushort>(0x03, "INC", "BC", val => registers.SetBC(val), null, () => registers.BC),
+                new Mapping<ushort>(0x13, "INC", "DE", val => registers.SetDE(val), null, () => registers.DE),
+                new Mapping<ushort>(0x23, "INC", "HL", val => registers.SetHL(val), null, () => registers.HL),
+                new Mapping<ushort>(0x33, "INC", "SP", val => registers.SetSP(val), null, () => registers.SP),
+            };
+
+            foreach (var mapping in inc16Mappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<ushort>("VAL16"), mapping.Input)
+                        .Add<ushort, ushort>(vars.Get<ushort>("VAL16"), 1)
+                        .Output             (vars.Get<ushort>("VAL16"), mapping.Output)
+                        .Cycle              (2))
+                    .Compile();
+            }
+
+            var dec16Mappings = new Mapping<ushort>[]
+            {
+                new Mapping<ushort>(0x0B, "DEC", "BC", val => registers.SetBC(val), null, () => registers.BC),
+                new Mapping<ushort>(0x1B, "DEC", "DE", val => registers.SetDE(val), null, () => registers.DE),
+                new Mapping<ushort>(0x2B, "DEC", "HL", val => registers.SetHL(val), null, () => registers.HL),
+                new Mapping<ushort>(0x3B, "DEC", "SP", val => registers.SetSP(val), null, () => registers.SP),
+            };
+
+            foreach (var mapping in dec16Mappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<ushort>("VAL16"), mapping.Input)
+                        .Subtract<ushort>   (vars.Get<ushort>("VAL16"), 1)
+                        .Output             (vars.Get<ushort>("VAL16"), mapping.Output)
+                        .Cycle              (2))
+                    .Compile();
+            }
+
+            var add16Mappings = new Mapping<ushort>[]
+            {
+                new Mapping<ushort>(0x09, "ADD", "HL", null, "BC", () => registers.BC),
+                new Mapping<ushort>(0x19, "ADD", "HL", null, "DE", () => registers.DE),
+                new Mapping<ushort>(0x29, "ADD", "HL", null, "HL", () => registers.HL),
+                new Mapping<ushort>(0x39, "ADD", "HL", null, "SP", () => registers.SP),
+            };
+
+            foreach (var mapping in add16Mappings)
+            {
+                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<ushort>("VAL16"), () => registers.HL)
+                        .WriteFlags         (() => registers.Flags)
+                        .Add<ushort, ushort>(vars.Get<ushort>("VAL16"), mapping.Input)
+                        .ReadFlags          (flags => registers.SetFlags(flags, ProcessorFlags.All ^ ProcessorFlags.Zero))
+                        .Output             (vars.Get<ushort>("VAL16"), (ushort val) => registers.SetHL(val))
+                        .Cycle              (2))
+                    .Compile();
+            }
+
+            // ADD SP, r8
+            this.opcodes[0xE8] = new InstructionBuilder(0xE8, "ADD SP, r8", cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<ushort>("VAL16"), () => registers.SP)
+                        .Add<ushort, sbyte> (vars.Get<ushort>("VAL16"), () => assembly.Read().TwosComplement())
+                        .Cycle              (2)
+                        .UnsetFlags         (ProcessorFlags.Zero | ProcessorFlags.Arithmetic)
+                        .ReadFlags          (flags => registers.SetFlags(flags))
+                        .Output             (vars.Get<ushort>("VAL16"), (ushort val) => registers.SetSP(val))
+                        .Cycle              (2))
+                    .Compile();
+
+            #endregion
         }
     }
 }
