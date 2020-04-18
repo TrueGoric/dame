@@ -18,6 +18,18 @@ namespace Dame.Processor
 
         private Dictionary<int, Instruction> opcodes;
 
-        
+        public Processor(EmulationState state, MemoryController memory, ProcessorExecutionContext context)
+        {
+            currentState = state;
+            memoryController = memory;
+            cpuContext = context;
+
+            registers = new RegisterAccessor(currentState);
+            assembly = new MemoryAccessor(memoryController);
+
+            opcodes = new Dictionary<int, Instruction>();
+
+            MapOpcodes();
+        }
     }
 }

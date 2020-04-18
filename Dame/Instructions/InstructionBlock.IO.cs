@@ -15,6 +15,8 @@ namespace Dame.Instructions
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
 
+            variables.Add(variable);
+
             expressions.Add((ExpressionGroup.IO, Expression.Assign(variable, Expression.Invoke(expression))));
             
             if (fetchCycles > 0)
@@ -28,6 +30,8 @@ namespace Dame.Instructions
         {
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
+
+            variables.Add(variable);
 
             expressions.Add((ExpressionGroup.IO, Expression.Invoke(expression, new[] { variable })));
 

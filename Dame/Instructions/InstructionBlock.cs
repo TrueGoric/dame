@@ -38,8 +38,11 @@ namespace Dame.Instructions
         private readonly IInstructionContext instructionContext;
 
         private List<(ExpressionGroup Group, object Expr)> expressions;
+        private List<ParameterExpression> variables;
 
         public IEnumerable<(ExpressionGroup Group, Expression Expr)> Expressions => PopulateExpressions(this);
+        public IEnumerable<ParameterExpression> Variables => PopulateVariables(this);
+
         public ProcessorFlags FlagsRead => instructionContext.FlagsRead;
 
         public InstructionBlock(ProcessorExecutionContext context, IInstructionContext instructionContext)
@@ -48,6 +51,9 @@ namespace Dame.Instructions
             this.instructionContext = instructionContext;
 
             expressions = new List<(ExpressionGroup Group, object Expr)>();
+            variables = new List<ParameterExpression>();
+
+            variables.Add(instructionContext.FlagsVariable);
         }
 
         private static IEnumerable<(ExpressionGroup Group, Expression Expr)> PopulateExpressions(InstructionBlock block)
@@ -68,6 +74,28 @@ namespace Dame.Instructions
                     // TODO: pre-optimize flags if not read
                     
                     yield return (expr.Group, nestedExpr);
+                }
+            }
+        }
+
+        private static IEnumerable<ParameterExpression> PopulateVariables(InstructionBlock block)
+        {
+            foreach (var variable in block.variables)
+                yield return variable;
+
+            foreach (var expr in block.expressions)
+            {
+                if (expr.Expr is InstructionBlock nestedBlock)
+                {
+                    foreach (var nestedVariable in PopulateVariables(nestedBlock))
+                        yield return nestedVariable;
+                }
+                else if (expr.Expr is InstructionCondition nestedCondition)
+                {
+                    foreach (var nestedVariable in PopulateVariables(nestedCondition.IfTrue))
+                        yield return nestedVariable;
+                    foreach (var nestedVariable in PopulateVariables(nestedCondition.IfFalse))
+                        yield return nestedVariable;
                 }
             }
         }

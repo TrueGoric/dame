@@ -7,7 +7,7 @@ namespace Dame.Accessors
     {
         private readonly EmulationState emulationState;
 
-        public EmulationState State { get; }
+        public EmulationState State => emulationState;
 
         #region Register Accessors
 
@@ -157,7 +157,7 @@ namespace Dame.Accessors
 
         public RegisterAccessor(EmulationState state)
         {
-            State = state;
+            emulationState = state;
         }
     }
 }

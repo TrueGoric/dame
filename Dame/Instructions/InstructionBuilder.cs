@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Dame.Accessors;
 using Dame.Architecture;
@@ -33,7 +34,7 @@ namespace Dame.Instructions
         private string mnemonic;
         private readonly ProcessorExecutionContext context;
 
-        private List<(ExpressionGroup Group, Expression Expr)> expressions;
+        private List<InstructionBlock> blocks;
 
         public InstructionBuilder(int opcode, string mnemonic, ProcessorExecutionContext context)
         {
@@ -41,7 +42,7 @@ namespace Dame.Instructions
             this.mnemonic = mnemonic;
             this.context = context;
 
-            expressions = new List<(ExpressionGroup Group, Expression Expr)>();
+            blocks = new List<InstructionBlock>();
         }
 
         public InstructionBuilder With(Action<InstructionBlock> blockSet)
@@ -51,14 +52,37 @@ namespace Dame.Instructions
 
             blockSet(block);
 
-            expressions.AddRange(block.Expressions);
+            blocks.Add(block);
 
             return this;
         }
 
         public Instruction Compile()
         {
-            throw new NotImplementedException();
+            var expressions = blocks
+                .SelectMany(b => b.Expressions)
+                .ToList();
+
+            var variables = blocks
+                .SelectMany(b => b.Variables)
+                .Distinct()
+                .ToList();
+            
+            var statements = expressions
+                .Select(e => e.Expr);
+
+            var @delegate = Expression.Lambda<InstructionDelegate>(
+                Expression.Block(
+                    variables,
+                    statements
+                )
+            )
+#if DEBUG
+            .Compile();
+#else
+            .CompileFast();
+#endif
+            return new Instruction(mnemonic, @delegate);
         }
     }
 }

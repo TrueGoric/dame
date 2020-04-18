@@ -15,6 +15,8 @@ namespace Dame.Instructions
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
 
+            variables.Add(variable);
+
             var halfSize = sizeof(T) / 2;
 
             // set flags
@@ -40,12 +42,15 @@ namespace Dame.Instructions
         {
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
+
+            variables.Add(variable);
             
             var size = sizeof(T) * 4;
             var lowMask = 1;
             var highMask = 1 << (size - 1);
 
             var carryVariable = Expression.Variable(typeof(bool), "carryHold");
+            variables.Add(carryVariable);
 
             // set flags
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
@@ -85,12 +90,15 @@ namespace Dame.Instructions
         {
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
+
+            variables.Add(variable);
             
             var size = sizeof(T) * 4;
             var lowMask = 1;
             var highMask = 1 << (size - 1);
 
             var carryVariable = Expression.Variable(typeof(bool), "carryHold");
+            variables.Add(carryVariable);
 
             // set flags
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
@@ -130,6 +138,8 @@ namespace Dame.Instructions
         {
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
+
+            variables.Add(variable);
             
             var size = sizeof(T) * 4;
             var lowMask = 1;
@@ -137,6 +147,7 @@ namespace Dame.Instructions
             var nearLowMask = lowMask << 1;
 
             var carryVariable = Expression.Variable(typeof(bool), "carryHold");
+            variables.Add(carryVariable);
 
             // set flags
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
@@ -171,6 +182,8 @@ namespace Dame.Instructions
         {
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
+
+            variables.Add(variable);
             
             var size = sizeof(T) * 4;
             var lowMask = 1;
@@ -178,6 +191,7 @@ namespace Dame.Instructions
             var nearHighMask = highMask >> 1;
 
             var carryVariable = Expression.Variable(typeof(bool), "carryHold");
+            variables.Add(carryVariable);
 
             // set flags
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));

@@ -27,6 +27,8 @@ namespace Dame.Instructions
             ThrowOnUnsupportedType<U>();
             ThrowOnVariableTypeMismatch<T>(variable);
 
+            variables.Add(variable);
+
             var carryMask = GetMaxValue<T>() < GetMaxValue<U>()
                 ? GetMaxValue<T>()
                 : GetMaxValue<U>();
@@ -35,6 +37,8 @@ namespace Dame.Instructions
                 : GetMaxValue<U>() >> 4;
 
             var expressionResult = Expression.Variable(typeof(T), "expressionResult");
+            variables.Add(expressionResult);
+
             var carryValue = GetCarryFlagValue();
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, expression)));
@@ -72,10 +76,14 @@ namespace Dame.Instructions
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
 
+            variables.Add(variable);
+
             var carryMask = GetMaxValue<T>();
             var halfCarryMask = GetMaxValue<T>() >> 4;
 
             var expressionResult = Expression.Variable(typeof(T), "expressionResult");
+            variables.Add(expressionResult);
+
             var carryValue = GetCarryFlagValue();
             var expressionAndCarry = Expression.Add(expressionResult, carryValue);
 
@@ -103,7 +111,10 @@ namespace Dame.Instructions
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
 
+            variables.Add(variable);
+
             var expressionResult = Expression.Variable(typeof(T), "expressionResult");
+            variables.Add(expressionResult);
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, expression)));
 
@@ -126,7 +137,10 @@ namespace Dame.Instructions
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
 
+            variables.Add(variable);
+
             var expressionResult = Expression.Variable(typeof(T), "expressionResult");
+            variables.Add(expressionResult);
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, expression)));
 
@@ -149,7 +163,10 @@ namespace Dame.Instructions
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
 
+            variables.Add(variable);
+
             var expressionResult = Expression.Variable(typeof(T), "expressionResult");
+            variables.Add(expressionResult);
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, expression)));
 
@@ -172,6 +189,8 @@ namespace Dame.Instructions
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
 
+            variables.Add(variable);
+
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, true)));
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, true)));
 
@@ -187,7 +206,10 @@ namespace Dame.Instructions
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<byte>(variable); // currently supporting only bytes
 
+            variables.Add(variable);
+
             var carryFlipVariable = Expression.Variable(typeof(bool), "carryFlip");
+            variables.Add(carryFlipVariable);
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.IfThenElse(
                 ReadFlag(ProcessorFlags.Arithmetic),

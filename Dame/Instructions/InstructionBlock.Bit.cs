@@ -15,6 +15,8 @@ namespace Dame.Instructions
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
 
+            variables.Add(variable);
+
             var mask = 1 << bit;
 
             // set flags
@@ -36,6 +38,8 @@ namespace Dame.Instructions
         {
             ThrowOnUnsupportedType<T>();
             ThrowOnVariableTypeMismatch<T>(variable);
+
+            variables.Add(variable);
 
             if (value)
             {
