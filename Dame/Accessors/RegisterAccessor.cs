@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using Dame.Processor;
 
@@ -77,38 +78,38 @@ namespace Dame.Accessors
         // 16-bit registers
         public ushort BC
         {
-            get => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[0..1])[0];
-            set => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[0..1])[0] = value;
+            get => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 0, 2))[0];
+            set => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 0, 2))[0] = value;
         }
 
         public ushort DE
         {
-            get => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[2..3])[0];
-            set => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[2..3])[0] = value;
+            get => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 2, 2))[0];
+            set => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 2, 2))[0] = value;
         }
 
         public ushort HL
         {
-            get => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[4..5])[0];
-            set => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[4..5])[0] = value;
+            get => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 4, 2))[0];
+            set => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 4, 2))[0] = value;
         }
 
         public ushort SP
         {
-            get => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[8..9])[0];
-            set => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[8..9])[0] = value;
+            get => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 8, 2))[0];
+            set => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 8, 2))[0] = value;
         }
 
         public ushort PC
         {
-            get => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[10..11])[0];
-            set => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[10..11])[0] = value;
+            get => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 10, 2))[0];
+            set => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 10, 2))[0] = value;
         }
 
         public ushort AF
         {
-            get => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[6..7])[0];
-            set => MemoryMarshal.Cast<byte, ushort>(emulationState.Registers[6..7])[0] = value;
+            get => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 6, 2))[0];
+            set => MemoryMarshal.Cast<byte, ushort>(new Span<byte>(emulationState.Registers, 6, 2))[0] = value;
         }
 
         #endregion
