@@ -12,14 +12,14 @@ namespace Dame.Instructions
         public InstructionBlock Add<T, U>(ParameterExpression variable, Expression<InstructionValue<U>> expression, bool withCarry = false)
             where T : unmanaged
             where U : unmanaged
-            => Add<T, U>(variable, expression);
+            => Add<T, U>(variable, Expression.Invoke(expression), withCarry);
 
         public InstructionBlock Add<T, U>(ParameterExpression variable, U value, bool withCarry = false)
             where T : unmanaged
             where U : unmanaged
-            => Add<T, U>(variable, Expression.Constant(value, typeof(U)));
+            => Add<T, U>(variable, Expression.Constant(value, typeof(U)), withCarry);
 
-        private InstructionBlock Add<T, U>(ParameterExpression variable, Expression expression, bool withCarry = false)
+        private InstructionBlock Add<T, U>(ParameterExpression variable, Expression expression, bool withCarry)
             where T : unmanaged
             where U : unmanaged
         {
@@ -36,7 +36,7 @@ namespace Dame.Instructions
                 ? GetMaxValue<T>() >> 4
                 : GetMaxValue<U>() >> 4;
 
-            var expressionResult = Expression.Variable(typeof(T), "expressionResult");
+            var expressionResult = Expression.Variable(typeof(U), "expressionResult");
             variables.Add(expressionResult);
 
             var carryValue = GetCarryFlagValue();
@@ -44,7 +44,7 @@ namespace Dame.Instructions
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, expression)));
 
             if (withCarry)
-                expressions.Add((ExpressionGroup.Arithmetic, Expression.AddAssign(expressionResult, carryValue)));
+                expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, WrappedAdd<U>(expressionResult, carryValue))));
 
             // set flags
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
@@ -54,7 +54,7 @@ namespace Dame.Instructions
                 TestAddCarry(halfCarryMask, variable, expressionResult)
                 )));
 
-            expressions.Add((ExpressionGroup.Arithmetic, Expression.AddAssign(variable, expressionResult)));
+            expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(variable, WrappedAdd<T>(variable, expressionResult)))); // unchecked wrapped add
 
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
                 Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
@@ -64,13 +64,13 @@ namespace Dame.Instructions
 
         public InstructionBlock Subtract<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression, bool withCarry = false)
             where T : unmanaged
-            => Subtract<T>(variable, expression);
+            => Subtract<T>(variable, Expression.Invoke(expression), withCarry);
 
         public InstructionBlock Subtract<T>(ParameterExpression variable, T value, bool withCarry = false)
             where T : unmanaged
-            => Subtract<T>(variable, Expression.Constant(value, typeof(T)));
+            => Subtract<T>(variable, Expression.Constant(value, typeof(T)), withCarry);
 
-        private InstructionBlock Subtract<T>(ParameterExpression variable, Expression expression, bool withCarry = false)
+        private InstructionBlock Subtract<T>(ParameterExpression variable, Expression expression, bool withCarry)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
@@ -85,7 +85,7 @@ namespace Dame.Instructions
             variables.Add(expressionResult);
 
             var carryValue = GetCarryFlagValue();
-            var expressionAndCarry = Expression.Add(expressionResult, carryValue);
+            var expressionAndCarry = WrappedAdd<T>(expressionResult, carryValue);
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, expression)));
 
@@ -97,7 +97,10 @@ namespace Dame.Instructions
                 TestSubCarry<T>(halfCarryMask, variable, expressionResult, withCarry ? carryValue : null)
                 )));
 
-            expressions.Add((ExpressionGroup.Arithmetic, Expression.SubtractAssign(variable, withCarry ? (Expression)expressionAndCarry : expressionResult)));
+            expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(variable, WrappedSub<T>(
+                variable,
+                withCarry ? (Expression)expressionAndCarry : expressionResult
+            ))));
 
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
                 Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
@@ -116,7 +119,7 @@ namespace Dame.Instructions
             var expressionResult = Expression.Variable(typeof(T), "expressionResult");
             variables.Add(expressionResult);
 
-            expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, expression)));
+            expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, Expression.Invoke(expression))));
 
             // set flags
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
@@ -142,7 +145,7 @@ namespace Dame.Instructions
             var expressionResult = Expression.Variable(typeof(T), "expressionResult");
             variables.Add(expressionResult);
 
-            expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, expression)));
+            expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, Expression.Invoke(expression))));
 
             // set flags
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, true)));
@@ -168,7 +171,7 @@ namespace Dame.Instructions
             var expressionResult = Expression.Variable(typeof(T), "expressionResult");
             variables.Add(expressionResult);
 
-            expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, expression)));
+            expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, Expression.Invoke(expression))));
 
             // set flags
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
@@ -194,7 +197,7 @@ namespace Dame.Instructions
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, true)));
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, true)));
 
-            expressions.Add((ExpressionGroup.Arithmetic, Expression.ExclusiveOrAssign(variable, Expression.Constant(GetMaxValue<T>(), typeof(T)))));
+            expressions.Add((ExpressionGroup.Arithmetic, Expression.ExclusiveOrAssign(variable, Expression.Convert(Expression.Constant(GetMaxValue<T>()), typeof(T)))));
 
             return this;
         }
@@ -216,24 +219,30 @@ namespace Dame.Instructions
                 Expression.Block(
                     Expression.IfThen(
                         ReadFlag(ProcessorFlags.Carry),
-                        Expression.SubtractAssign(variable, Expression.Constant(0x60))
+                        Expression.Assign(variable, WrappedSub<T>(variable, Expression.Constant((byte)0x60)))
                     ),
                     Expression.IfThen(
                         ReadFlag(ProcessorFlags.HalfCarry),
-                        Expression.SubtractAssign(variable, Expression.Constant(0x6))
+                        Expression.Assign(variable, WrappedSub<T>(variable, Expression.Constant((byte)0x6)))
                     )
                 ),
                 Expression.Block(
                     Expression.IfThen(
-                        Expression.Or(ReadFlag(ProcessorFlags.Carry), Expression.GreaterThan(variable, Expression.Constant(0x99))),
+                        Expression.OrElse(ReadFlag(ProcessorFlags.Carry), Expression.GreaterThan(Expression.Convert(variable, typeof(long)), Expression.Constant(0x99L))),
                         Expression.Block(
-                            Expression.AddAssign(variable, Expression.Constant(0x60)),
+                            Expression.Assign(variable, WrappedAdd<T>(variable, Expression.Constant(0x60))),
                             Expression.Assign(carryFlipVariable, Expression.Constant(true))
                         )
                     ),
                     Expression.IfThen(
-                        Expression.Or(ReadFlag(ProcessorFlags.HalfCarry), Expression.GreaterThan(Expression.And(variable, Expression.Constant(0x0F)), Expression.Constant(0x09))),
-                        Expression.AddAssign(variable, Expression.Constant(0x6))
+                        Expression.OrElse(
+                            ReadFlag(ProcessorFlags.HalfCarry),
+                            Expression.GreaterThan(
+                                Expression.Convert(Expression.And(variable, Expression.Convert(Expression.Constant(0x0F), typeof(T))), typeof(long)),
+                                Expression.Constant(0x09L)
+                            )
+                        ),
+                        Expression.Assign(variable, WrappedAdd<T>(variable, Expression.Constant(0x6)))
                     )
                 )
             )));
@@ -251,6 +260,8 @@ namespace Dame.Instructions
         {
             switch (Type.GetTypeCode(typeof(T)))
             {
+                case TypeCode.SByte:
+                    return sbyte.MaxValue;
                 case TypeCode.Byte:
                     return byte.MaxValue;
                 case TypeCode.UInt16:
@@ -266,10 +277,10 @@ namespace Dame.Instructions
         private Expression TestAddCarry(long mask, Expression firstExpression, Expression secondExpression)
             => Expression.GreaterThan(
                     Expression.Add(
-                        Expression.And(firstExpression, Expression.Constant(mask, typeof(long))),
-                        Expression.And(secondExpression, Expression.Constant(mask, typeof(long)))
+                        Expression.Convert(Expression.And(firstExpression, Expression.Convert(Expression.Constant(mask), firstExpression.Type)), typeof(long)),
+                        Expression.Convert(Expression.And(secondExpression, Expression.Convert(Expression.Constant(mask), secondExpression.Type)), typeof(long))
                     ),
-                    Expression.Constant(mask, typeof(long))
+                    Expression.Constant(mask)
                 ); // (variable & mask) + (expressionResult & mask) > mask
         
         private Expression TestSubCarry<T>(long mask, Expression firstExpression, Expression secondExpression, Expression carryExpression = null)
@@ -278,32 +289,39 @@ namespace Dame.Instructions
                 Expression.And(
                     carryExpression == null
                     ? WrappedSub<T>(
-                        Expression.And(firstExpression, Expression.Constant(mask)),
-                        Expression.And(secondExpression, Expression.Constant(mask))
+                        Expression.And(firstExpression, Expression.Convert(Expression.Constant(mask), typeof(T))),
+                        Expression.And(secondExpression, Expression.Convert(Expression.Constant(mask), typeof(T)))
                     )
                     : WrappedSub<T>(
                         WrappedSub<T>(
-                            Expression.And(firstExpression, Expression.Constant(mask)),
-                            Expression.And(secondExpression, Expression.Constant(mask))
+                            Expression.And(firstExpression, Expression.Convert(Expression.Constant(mask), typeof(T))),
+                            Expression.And(secondExpression, Expression.Convert(Expression.Constant(mask), typeof(T)))
                         ),
                         carryExpression
                     ),
-                    Expression.Constant(mask + 1)
+                    Expression.Convert(Expression.Constant(mask + 1), typeof(T))
                 ),
-                Expression.Constant(0)
+                Expression.Convert(Expression.Constant(0), typeof(T))
+            );
+        
+        private Expression WrappedAdd<T>(Expression leftExpression, Expression rightExpression)
+            where T : unmanaged
+            => Expression.Convert(
+                Expression.Add(
+                    Expression.Convert(leftExpression, typeof(long)),
+                    Expression.Convert(rightExpression, typeof(long))
+                ),
+                typeof(T)
             );
 
         private unsafe Expression WrappedSub<T>(Expression leftExpression, Expression rightExpression)
             where T : unmanaged
-            => Modulus(Expression.Subtract(leftExpression, rightExpression), Expression.Constant(sizeof(T)));
-
-        private Expression Modulus(Expression leftExpression, Expression rightExpression)
-            => Expression.Modulo(
-                Expression.Add(
-                    Expression.Modulo(leftExpression, rightExpression),
-                    rightExpression
+            => Expression.Convert(
+                Expression.Subtract(
+                    Expression.Convert(leftExpression, typeof(long)),
+                    Expression.Convert(rightExpression, typeof(long))
                 ),
-                rightExpression
+                typeof(T)
             );
     }
 }

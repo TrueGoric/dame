@@ -31,7 +31,7 @@ namespace Dame.Instructions
                         Expression.Convert(instructionContext.FlagsVariable, typeof(byte)),
                         Expression.Constant((byte)flags, typeof(byte))
                     ),
-                    Expression.Constant(0, typeof(byte))
+                    Expression.Constant((byte)0)
                 ),
                 ifTrueBlock,
                 ifFalseBlock

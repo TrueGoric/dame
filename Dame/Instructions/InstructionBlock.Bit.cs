@@ -25,8 +25,8 @@ namespace Dame.Instructions
 
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
                 Expression.Equal(
-                    Expression.And(variable, Expression.Constant(mask)),
-                    Expression.Constant(0)
+                    Expression.And(variable, Expression.Convert(Expression.Constant(mask), typeof(T))),
+                    Expression.Constant((byte)0)
                 )
             ))); // variable & mask == 0
 
@@ -44,12 +44,12 @@ namespace Dame.Instructions
             if (value)
             {
                 var orMask = 1 << bit;
-                expressions.Add((ExpressionGroup.Bit, Expression.OrAssign(variable, Expression.Constant(orMask))));
+                expressions.Add((ExpressionGroup.Bit, Expression.OrAssign(variable, Expression.Convert(Expression.Constant(orMask), typeof(T)))));
             }
             else
             {
                 var andMask = ~(1 << bit);
-                expressions.Add((ExpressionGroup.Bit, Expression.AndAssign(variable, Expression.Constant(andMask))));
+                expressions.Add((ExpressionGroup.Bit, Expression.AndAssign(variable, Expression.Convert(Expression.Constant(andMask), typeof(T)))));
             }
 
             return this;

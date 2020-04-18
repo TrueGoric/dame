@@ -38,11 +38,11 @@ namespace Dame.Processor
                 Mnemonic = mnemonic;
 
                 if (outputName != null)
-                    Mnemonic += outputName;
+                    Mnemonic += " " + outputName;
                 if (outputName != null && inputName != null)
-                    Mnemonic += ", ";
+                    Mnemonic += ",";
                 if (inputName != null)
-                    Mnemonic += inputName;
+                    Mnemonic += " " + inputName;
 
                 Input = input;
                 Output = output;
@@ -1164,7 +1164,7 @@ namespace Dame.Processor
                 new Mapping<byte>(0xCB_FF, "SET", "7", val => registers.SetA(val), "A", () => registers.A),
             };
 
-            foreach (var mapping in testMappings)
+            foreach (var mapping in setBitMappings)
             {
                 var bit = ((mapping.Opcode - 0xCB_80) / 8) % 8;
                 var value = mapping.Opcode > 0xCB_BF;

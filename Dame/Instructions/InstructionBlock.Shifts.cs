@@ -59,8 +59,8 @@ namespace Dame.Instructions
             expressions.Add((ExpressionGroup.Shift, Expression.Assign(
                 carryVariable,
                 Expression.GreaterThan(
-                    Expression.And(variable, Expression.Constant(highMask)),
-                    Expression.Constant(0)
+                    Expression.And(variable, Expression.Convert(Expression.Constant(highMask), typeof(T))),
+                    Expression.Constant((byte)0)
                 )
             )));
 
@@ -69,12 +69,12 @@ namespace Dame.Instructions
             if (overrideCarry)
                 expressions.Add((ExpressionGroup.Shift, Expression.IfThen(
                     carryVariable,
-                    Expression.AddAssign(variable, Expression.Constant(lowMask))
+                    Expression.Assign(variable, WrappedAdd<T>(variable, Expression.Constant(lowMask)))
                 )));
             else
                 expressions.Add((ExpressionGroup.Shift, Expression.IfThen(
                     ReadFlag(ProcessorFlags.Carry),
-                    Expression.AddAssign(variable, Expression.Constant(lowMask))
+                    Expression.Assign(variable, WrappedAdd<T>(variable, Expression.Constant(lowMask)))
                 )));
 
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry, carryVariable)));
@@ -107,8 +107,8 @@ namespace Dame.Instructions
             expressions.Add((ExpressionGroup.Shift, Expression.Assign(
                 carryVariable,
                 Expression.GreaterThan(
-                    Expression.And(variable, Expression.Constant(lowMask)),
-                    Expression.Constant(0)
+                    Expression.And(variable, Expression.Convert(Expression.Constant(lowMask), typeof(T))),
+                    Expression.Constant((byte)0)
                 )
             )));
             
@@ -117,12 +117,12 @@ namespace Dame.Instructions
             if (overrideCarry)
                 expressions.Add((ExpressionGroup.Shift, Expression.IfThen(
                     carryVariable,
-                    Expression.AddAssign(variable, Expression.Constant(highMask))
+                    Expression.Assign(variable, WrappedAdd<T>(variable, Expression.Constant(highMask)))
                 )));
             else
                 expressions.Add((ExpressionGroup.Shift, Expression.IfThen(
                     ReadFlag(ProcessorFlags.Carry),
-                    Expression.AddAssign(variable, Expression.Constant(highMask))
+                    Expression.Assign(variable, WrappedAdd<T>(variable, Expression.Constant(highMask)))
                 )));
 
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry, carryVariable)));
@@ -156,8 +156,8 @@ namespace Dame.Instructions
             expressions.Add((ExpressionGroup.Shift, Expression.Assign(
                 carryVariable,
                 Expression.GreaterThan(
-                    Expression.And(variable, Expression.Constant(highMask)),
-                    Expression.Constant(0)
+                    Expression.And(variable, Expression.Convert(Expression.Constant(highMask), typeof(T))),
+                    Expression.Constant((byte)0)
                 )
             )));
 
@@ -200,8 +200,8 @@ namespace Dame.Instructions
             expressions.Add((ExpressionGroup.Shift, Expression.Assign(
                 carryVariable,
                 Expression.GreaterThan(
-                    Expression.And(variable, Expression.Constant(lowMask)),
-                    Expression.Constant(0)
+                    Expression.And(variable, Expression.Convert(Expression.Constant(lowMask), typeof(T))),
+                    Expression.Constant((byte)0)
                 )
             )));
 
@@ -209,8 +209,8 @@ namespace Dame.Instructions
             
             if (copyBit)
                 expressions.Add((ExpressionGroup.Shift, Expression.IfThen(
-                    Expression.GreaterThan(Expression.And(variable, Expression.Constant(nearHighMask)), Expression.Constant(0)),
-                    Expression.AddAssign(variable, Expression.Constant(highMask))
+                    Expression.GreaterThan(Expression.And(variable, Expression.Convert(Expression.Constant(nearHighMask), typeof(T))), Expression.Constant((byte)0)),
+                    Expression.Assign(variable, WrappedAdd<T>(variable, Expression.Constant(highMask)))
                 )));
 
             expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry, carryVariable)));

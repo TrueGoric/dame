@@ -11,7 +11,7 @@ namespace Dame.Instructions
     {
         public InstructionBlock WriteFlags(Expression<InstructionValue<byte>> expression)
         {
-            expressions.Add((ExpressionGroup.IO, Expression.Assign(instructionContext.FlagsVariable, expression)));
+            expressions.Add((ExpressionGroup.IO, Expression.Assign(instructionContext.FlagsVariable, Expression.Invoke(expression))));
 
             return this;
         }
@@ -63,12 +63,12 @@ namespace Dame.Instructions
                 : Expression.AndAssign(instructionContext.FlagsVariable, Expression.OnesComplement(Expression.Convert(Expression.Constant(flags, typeof(ProcessorFlags)), typeof(byte))));
         
         private Expression GetCarryFlagValue()
-            => Expression.And(Expression.RightShift(instructionContext.FlagsVariable, Expression.Constant(4)), Expression.Constant(0x1));
+            => Expression.And(Expression.RightShift(instructionContext.FlagsVariable, Expression.Constant(4)), Expression.Constant((byte)0x1));
         
         private Expression ReadFlag(ProcessorFlags flag)
             => Expression.GreaterThan(
-                Expression.And(instructionContext.FlagsVariable, Expression.Constant(flag)),
-                Expression.Constant(1)
+                Expression.And(instructionContext.FlagsVariable, Expression.Constant((byte)flag)),
+                Expression.Constant((byte)1)
             );
     }
 }
