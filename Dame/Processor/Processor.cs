@@ -14,7 +14,7 @@ namespace Dame.Processor
         private MemoryController memoryController;
 
         private RegisterAccessor registers;
-        private MemoryAccessor assembly;
+        private AssemblyAccessor assembly;
 
         private Dictionary<int, Instruction> opcodes;
 
@@ -25,7 +25,7 @@ namespace Dame.Processor
             cpuContext = context;
 
             registers = new RegisterAccessor(currentState);
-            assembly = new MemoryAccessor(memoryController);
+            assembly = new AssemblyAccessor(memoryController, registers);
 
             opcodes = new Dictionary<int, Instruction>();
 

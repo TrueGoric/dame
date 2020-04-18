@@ -5,7 +5,7 @@ using Dame.Memory;
 
 namespace Dame.Accessors
 {
-    sealed class MemoryAccessor
+    class MemoryAccessor
     {
         private readonly MemoryController memoryController;
 
@@ -14,7 +14,7 @@ namespace Dame.Accessors
             memoryController = controller;
         }
 
-        public int Location { get; set; }
+        public virtual int Location { get; set; }
 
         public byte Read() => memoryController.Read(Location++);
 
