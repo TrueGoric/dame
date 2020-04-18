@@ -173,45 +173,45 @@ namespace Dame.Processor
             // LD (HL+), A
             this.opcodes[0x22] = new InstructionBuilder(0x22, "LD (HL+), A", cpuContext)
                     .With(b => b
-                        .Input          (vars.Get<byte>("VAL8"), () => registers.A)
-                        .Output         (vars.Get<byte>("VAL8"), (byte val) => memoryController.Write(registers.HL, val), 1)
-                        .Input          (vars.Get<byte>("HL"), () => registers.HL)
-                        .Add<byte, byte>(vars.Get<byte>("HL"), 1)
-                        .Output         (vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl))
-                        .Cycle          ())
+                        .Input              (vars.Get<byte>("VAL8"), () => registers.A)
+                        .Output             (vars.Get<byte>("VAL8"), (byte val) => memoryController.Write(registers.HL, val), 1)
+                        .Input              (vars.Get<ushort>("HL"), () => registers.HL)
+                        .Add<ushort, ushort>(vars.Get<ushort>("HL"), 1)
+                        .Output             (vars.Get<ushort>("HL"), (ushort hl) => registers.SetHL(hl))
+                        .Cycle              ())
                     .Compile();
             
             // LD (HL-), A
             this.opcodes[0x32] = new InstructionBuilder(0x32, "LD (HL-), A", cpuContext)
                     .With(b => b
-                        .Input          (vars.Get<byte>("VAL8"), () => registers.A)
-                        .Output         (vars.Get<byte>("VAL8"), (byte val) => memoryController.Write(registers.HL, val), 1)
-                        .Input          (vars.Get<byte>("HL"), () => registers.HL)
-                        .Subtract<byte> (vars.Get<byte>("HL"), 1)
-                        .Output         (vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl))
-                        .Cycle          ())
+                        .Input              (vars.Get<byte>("VAL8"), () => registers.A)
+                        .Output             (vars.Get<byte>("VAL8"), (byte val) => memoryController.Write(registers.HL, val), 1)
+                        .Input              (vars.Get<ushort>("HL"), () => registers.HL)
+                        .Subtract<ushort>   (vars.Get<ushort>("HL"), 1)
+                        .Output             (vars.Get<ushort>("HL"), (ushort hl) => registers.SetHL(hl))
+                        .Cycle              ())
                     .Compile();
             
             // LD A, (HL+)
             this.opcodes[0x2A] = new InstructionBuilder(0x2A, "LD A, (HL+)", cpuContext)
                     .With(b => b
-                        .Input          (vars.Get<byte>("VAL8"), () => memoryController.Read(registers.HL), 1)
-                        .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
-                        .Input          (vars.Get<byte>("HL"), () => registers.HL)
-                        .Add<byte, byte>(vars.Get<byte>("HL"), 1)
-                        .Output         (vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl))
-                        .Cycle          ())
+                        .Input              (vars.Get<byte>("VAL8"), () => memoryController.Read(registers.HL), 1)
+                        .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
+                        .Input              (vars.Get<ushort>("HL"), () => registers.HL)
+                        .Add<ushort, ushort>(vars.Get<ushort>("HL"), 1)
+                        .Output             (vars.Get<ushort>("HL"), (ushort hl) => registers.SetHL(hl))
+                        .Cycle              ())
                     .Compile();
             
             // LD A, (HL-)
             this.opcodes[0x3A] = new InstructionBuilder(0x3A, "LD A, (HL-)", cpuContext)
                     .With(b => b
-                        .Input          (vars.Get<byte>("VAL8"), () => memoryController.Read(registers.HL), 1)
-                        .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
-                        .Input          (vars.Get<byte>("HL"), () => registers.HL)
-                        .Subtract<byte> (vars.Get<byte>("HL"), 1)
-                        .Output         (vars.Get<byte>("HL"), (byte hl) => registers.SetHL(hl))
-                        .Cycle          ())
+                        .Input              (vars.Get<byte>("VAL8"), () => memoryController.Read(registers.HL), 1)
+                        .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
+                        .Input              (vars.Get<ushort>("HL"), () => registers.HL)
+                        .Subtract<ushort>   (vars.Get<ushort>("HL"), 1)
+                        .Output             (vars.Get<ushort>("HL"), (ushort hl) => registers.SetHL(hl))
+                        .Cycle              ())
                     .Compile();
 
             #endregion
