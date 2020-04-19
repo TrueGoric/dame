@@ -15,7 +15,7 @@ namespace Dame.Exceptions
         { }
 
         public InstructionNotImplementedException(int opcode, string message, Exception innerException)
-            : base($"{message}\n Opcode: 0X{opcode.ToString("X")}", innerException)
+            : base($"{message}\n Opcode: 0x{opcode.ToString("X")}", innerException)
         {
             Opcode = opcode;
         }
