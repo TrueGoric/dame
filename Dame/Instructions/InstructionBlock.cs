@@ -71,8 +71,9 @@ namespace Dame.Instructions
                 }
                 else if (expr.Expr is Expression nestedExpr)
                 {
-                    // TODO: pre-optimize flags if not read
-                    
+                    if (expr.Group == ExpressionGroup.Flags && block.instructionContext.FlagsRead == ProcessorFlags.None)
+                        continue;
+
                     yield return (expr.Group, nestedExpr);
                 }
             }
@@ -117,7 +118,7 @@ namespace Dame.Instructions
             }
         }
 
-        private void ThrowOnVariableTypeMismatch<T>(ParameterExpression variable)
+        private void ThrowOnExpressionTypeMismatch<T>(Expression variable)
         {
             if (variable.Type != typeof(T))
                 throw new ArgumentException("Provided expression is not of the declared generic type!", nameof(variable));

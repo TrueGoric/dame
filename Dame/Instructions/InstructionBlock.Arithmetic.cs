@@ -9,23 +9,24 @@ namespace Dame.Instructions
 {
     sealed partial class InstructionBlock
     {
-        public InstructionBlock Add<T, U>(ParameterExpression variable, Expression<InstructionValue<U>> expression, bool withCarry = false)
+        public InstructionBlock Add<T, U>(ParameterExpression variable, Expression<InstructionValue<U>> expression, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
             where U : unmanaged
-            => Add<T, U>(variable, Expression.Invoke(expression), withCarry);
+            => Add<T, U>(variable, expression.Body, withCarry);
 
-        public InstructionBlock Add<T, U>(ParameterExpression variable, U value, bool withCarry = false)
+        public InstructionBlock Add<T, U>(ParameterExpression variable, U value, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
             where U : unmanaged
             => Add<T, U>(variable, Expression.Constant(value, typeof(U)), withCarry);
 
-        private InstructionBlock Add<T, U>(ParameterExpression variable, Expression expression, bool withCarry)
+        public InstructionBlock Add<T, U>(ParameterExpression variable, Expression expression, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
             where U : unmanaged
         {
             ThrowOnUnsupportedType<T>();
             ThrowOnUnsupportedType<U>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<U>(expression);
 
             variables.Add(variable);
 
@@ -46,35 +47,38 @@ namespace Dame.Instructions
             if (withCarry)
                 expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, WrappedAdd<U>(expressionResult, carryValue))));
 
-            // set flags
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry,
-                TestAddCarry(carryMask, variable, expressionResult))));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry,
-                TestAddCarry(halfCarryMask, variable, expressionResult)
-                )));
+            if (setFlags)
+            {
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry,
+                    TestAddCarry(carryMask, variable, expressionResult))));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry,
+                    TestAddCarry(halfCarryMask, variable, expressionResult)
+                    )));
+            }
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(variable, WrappedAdd<T>(variable, expressionResult)))); // unchecked wrapped add
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
-                Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
+            if (setFlags)
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
+                    Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
         }
 
-        public InstructionBlock Subtract<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression, bool withCarry = false)
+        public InstructionBlock Subtract<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
-            => Subtract<T>(variable, Expression.Invoke(expression), withCarry);
+            => Subtract<T>(variable, expression.Body, withCarry);
 
-        public InstructionBlock Subtract<T>(ParameterExpression variable, T value, bool withCarry = false)
+        public InstructionBlock Subtract<T>(ParameterExpression variable, T value, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
             => Subtract<T>(variable, Expression.Constant(value, typeof(T)), withCarry);
 
-        private InstructionBlock Subtract<T>(ParameterExpression variable, Expression expression, bool withCarry)
+        public InstructionBlock Subtract<T>(ParameterExpression variable, Expression expression, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<T>(variable);
 
             variables.Add(variable);
 
@@ -89,30 +93,33 @@ namespace Dame.Instructions
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, expression)));
 
-            // set flags
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, true)));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry,
-                TestSubCarry<T>(carryMask, variable, expressionResult, withCarry ? carryValue : null))));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry,
-                TestSubCarry<T>(halfCarryMask, variable, expressionResult, withCarry ? carryValue : null)
-                )));
+            if (setFlags)
+            {
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, true)));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry,
+                    TestSubCarry<T>(carryMask, variable, expressionResult, withCarry ? carryValue : null))));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry,
+                    TestSubCarry<T>(halfCarryMask, variable, expressionResult, withCarry ? carryValue : null)
+                    )));
+            }
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(variable, WrappedSub<T>(
                 variable,
                 withCarry ? (Expression)expressionAndCarry : expressionResult
             ))));
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
-                Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
+            if (setFlags)
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
+                    Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
         }
 
-        public InstructionBlock Or<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
+        public InstructionBlock Or<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression, bool setFlags = true)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<T>(variable);
 
             variables.Add(variable);
 
@@ -121,24 +128,27 @@ namespace Dame.Instructions
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, Expression.Invoke(expression))));
 
-            // set flags
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry, false)));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, false)));
+            if (setFlags)
+            {
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry, false)));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, false)));
+            }
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.OrAssign(variable, expressionResult)));
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
-                Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
+            if (setFlags)
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
+                    Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
         }
 
-        public InstructionBlock And<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
+        public InstructionBlock And<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression, bool setFlags = true)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<T>(variable);
 
             variables.Add(variable);
 
@@ -147,24 +157,27 @@ namespace Dame.Instructions
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, Expression.Invoke(expression))));
 
-            // set flags
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, true)));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry, false)));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, false)));
+            if (setFlags)
+            {
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, true)));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry, false)));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, false)));
+            }
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.AndAssign(variable, expressionResult)));
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
-                Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
+            if (setFlags)
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
+                    Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
         }
 
-        public InstructionBlock Xor<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression)
+        public InstructionBlock Xor<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression, bool setFlags = true)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<T>(variable);
 
             variables.Add(variable);
 
@@ -173,29 +186,35 @@ namespace Dame.Instructions
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.Assign(expressionResult, Expression.Invoke(expression))));
 
-            // set flags
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry, false)));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, false)));
+            if (setFlags)
+            {
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, false)));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Carry, false)));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, false)));
+            }
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.ExclusiveOrAssign(variable, expressionResult)));
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
-                Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
+            if (setFlags)
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Zero,
+                    Expression.Equal(variable, Expression.Default(typeof(T)))))); // variable == default(T)
 
             return this;
         }
 
-        public InstructionBlock Complement<T>(ParameterExpression variable)
+        public InstructionBlock Complement<T>(ParameterExpression variable, bool setFlags = true)
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<T>(variable);
 
             variables.Add(variable);
 
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, true)));
-            expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, true)));
+            if (setFlags)
+            {
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.Arithmetic, true)));
+                expressions.Add((ExpressionGroup.Flags, CreateFlagAssignExpression(ProcessorFlags.HalfCarry, true)));
+            }
 
             expressions.Add((ExpressionGroup.Arithmetic, Expression.ExclusiveOrAssign(variable, Expression.Convert(Expression.Constant(GetMaxValue<T>()), typeof(T)))));
 
@@ -207,7 +226,7 @@ namespace Dame.Instructions
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<byte>(variable); // currently supporting only bytes
+            ThrowOnExpressionTypeMismatch<byte>(variable); // currently supporting only bytes
 
             variables.Add(variable);
 

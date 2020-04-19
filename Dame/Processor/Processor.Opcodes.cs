@@ -88,8 +88,9 @@ namespace Dame.Processor
             // JR r8
             this.opcodes[0x18] = new InstructionBuilder(0x18, "JR r8", cpuContext)
                 .With(b => b
-                    .Input              (vars.Get<ushort>("PTR16"), () => registers.SP)
-                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), () => assembly.Read().TwosComplement())
+                    .Input              (vars.Get<sbyte>("R8"), () => assembly.Read().TwosComplement())
+                    .Input              (vars.Get<ushort>("PTR16"), () => registers.PC)
+                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), vars.Get<sbyte>("R8"), setFlags: false)
                     .Cycle              (2)
                     .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                     .Cycle              ())
@@ -146,8 +147,9 @@ namespace Dame.Processor
             // JR NZ, r8
             this.opcodes[0x20] = new InstructionBuilder(0x20, "JR NZ, r8", cpuContext)
                 .With(b => b
-                    .Input              (vars.Get<ushort>("PTR16"), () => registers.SP)
-                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), () => assembly.Read().TwosComplement())
+                    .Input              (vars.Get<sbyte>("R8"), () => assembly.Read().TwosComplement())
+                    .Input              (vars.Get<ushort>("PTR16"), () => registers.PC)
+                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), vars.Get<sbyte>("R8"), setFlags: false)
                     .Cycle              ()
                     .WriteFlags         (() => registers.Flags)
                     .IfFlagsUnset       (ProcessorFlags.Zero,
@@ -160,8 +162,9 @@ namespace Dame.Processor
             // JR Z, r8
             this.opcodes[0x28] = new InstructionBuilder(0x28, "JR Z, r8", cpuContext)
                 .With(b => b
-                    .Input              (vars.Get<ushort>("PTR16"), () => registers.SP)
-                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), () => assembly.Read().TwosComplement())
+                    .Input              (vars.Get<sbyte>("R8"), () => assembly.Read().TwosComplement())
+                    .Input              (vars.Get<ushort>("PTR16"), () => registers.PC)
+                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), vars.Get<sbyte>("R8"), setFlags: false)
                     .Cycle              ()
                     .WriteFlags         (() => registers.Flags)
                     .IfFlagsSet         (ProcessorFlags.Zero,
@@ -174,8 +177,9 @@ namespace Dame.Processor
             // JR NC, r8
             this.opcodes[0x30] = new InstructionBuilder(0x30, "JR NC, r8", cpuContext)
                 .With(b => b
-                    .Input              (vars.Get<ushort>("PTR16"), () => registers.SP)
-                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), () => assembly.Read().TwosComplement())
+                    .Input              (vars.Get<sbyte>("R8"), () => assembly.Read().TwosComplement())
+                    .Input              (vars.Get<ushort>("PTR16"), () => registers.PC)
+                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), vars.Get<sbyte>("R8"), setFlags: false)
                     .Cycle              ()
                     .WriteFlags         (() => registers.Flags)
                     .IfFlagsUnset       (ProcessorFlags.Carry,
@@ -188,8 +192,9 @@ namespace Dame.Processor
             // JR C, r8
             this.opcodes[0x38] = new InstructionBuilder(0x38, "JP C, r8", cpuContext)
                 .With(b => b
-                    .Input              (vars.Get<ushort>("PTR16"), () => registers.SP)
-                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), () => assembly.Read().TwosComplement())
+                    .Input              (vars.Get<sbyte>("R8"), () => assembly.Read().TwosComplement())
+                    .Input              (vars.Get<ushort>("PTR16"), () => registers.PC)
+                    .Add<ushort, sbyte> (vars.Get<ushort>("PTR16"), vars.Get<sbyte>("R8"), setFlags: false)
                     .Cycle              ()
                     .WriteFlags         (() => registers.Flags)
                     .IfFlagsSet         (ProcessorFlags.Carry,

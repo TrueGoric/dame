@@ -13,11 +13,11 @@ namespace Dame.Instructions
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<T>(variable);
 
             variables.Add(variable);
 
-            expressions.Add((ExpressionGroup.IO, Expression.Assign(variable, Expression.Invoke(expression))));
+            expressions.Add((ExpressionGroup.IO, Expression.Assign(variable, expression.Body)));
             
             if (fetchCycles > 0)
                 Cycle(fetchCycles);
@@ -29,7 +29,7 @@ namespace Dame.Instructions
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<T>(variable);
 
             variables.Add(variable);
 

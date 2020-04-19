@@ -13,7 +13,7 @@ namespace Dame.Instructions
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<T>(variable);
 
             variables.Add(variable);
 
@@ -37,7 +37,7 @@ namespace Dame.Instructions
             where T : unmanaged
         {
             ThrowOnUnsupportedType<T>();
-            ThrowOnVariableTypeMismatch<T>(variable);
+            ThrowOnExpressionTypeMismatch<T>(variable);
 
             variables.Add(variable);
 
