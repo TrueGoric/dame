@@ -78,12 +78,8 @@ namespace Dame.Instructions
                 ), mnemonic, null
             );
 
-            var @delegate = prefab
-#if DEBUG
-            .Compile();
-#else
-            .CompileFast();
-#endif
+            var @delegate = prefab.Compile();
+
             return new Instruction(mnemonic, @delegate);
         }
     }
