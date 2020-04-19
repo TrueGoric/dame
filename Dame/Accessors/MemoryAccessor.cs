@@ -16,9 +16,9 @@ namespace Dame.Accessors
 
         public virtual int Location { get; set; }
 
-        public byte Read() => memoryController.Read(Location++);
+        public virtual byte Read() => memoryController.Read(Location++);
 
-        public unsafe ushort ReadDouble()
+        public virtual unsafe ushort ReadDouble()
         {
             var value = memoryController.ReadDouble(Location);
 

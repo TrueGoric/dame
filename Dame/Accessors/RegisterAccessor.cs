@@ -27,51 +27,51 @@ namespace Dame.Accessors
 
         public byte B
         {
-            get => emulationState.Registers[0];
-            set => emulationState.Registers[0] = value;
+            get => emulationState.Registers[1];
+            set => emulationState.Registers[1] = value; // TODO: figure out how to handle differing endianness between archs, especially when saving snapshots
         }
 
         public byte C
         {
-            get => emulationState.Registers[1];
-            set => emulationState.Registers[1] = value;
+            get => emulationState.Registers[0];
+            set => emulationState.Registers[0] = value;
         }
 
         public byte D
 
         {
-            get => emulationState.Registers[2];
-            set => emulationState.Registers[2] = value;
-        }
-
-        public byte E
-        {
             get => emulationState.Registers[3];
             set => emulationState.Registers[3] = value;
         }
 
-        public byte H
+        public byte E
         {
-            get => emulationState.Registers[4];
-            set => emulationState.Registers[4] = value;
+            get => emulationState.Registers[2];
+            set => emulationState.Registers[2] = value;
         }
 
-        public byte L
+        public byte H
         {
             get => emulationState.Registers[5];
             set => emulationState.Registers[5] = value;
         }
 
+        public byte L
+        {
+            get => emulationState.Registers[4];
+            set => emulationState.Registers[4] = value;
+        }
+
         public byte A
         {
-            get => emulationState.Registers[6];
-            set => emulationState.Registers[6] = value;
+            get => emulationState.Registers[7];
+            set => emulationState.Registers[7] = value;
         }
 
         public byte F
         {
-            get => emulationState.Registers[7];
-            set => emulationState.Registers[7] = value;
+            get => emulationState.Registers[6];
+            set => emulationState.Registers[6] = value;
         }
 
 
@@ -117,7 +117,7 @@ namespace Dame.Accessors
         #region Setters
 
         public void SetFlags(byte value, ProcessorFlags mask)
-            => Flags = (byte)((value & (byte)mask) & (Flags & ~(byte)mask));
+            => Flags = (byte)((value & (byte)mask) | (Flags & ~(byte)mask));
         public void SetFlags(byte value)
             => Flags = value;
             

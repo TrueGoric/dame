@@ -8,19 +8,25 @@ namespace Dame.Memory
 {
     sealed class MemoryController
     {
-        private readonly SortedList<Range, IModifyBlock> modifyBlocks = new SortedList<Range, IModifyBlock>();
-        private readonly SortedList<Range, IReadBlock> readBlocks = new SortedList<Range, IReadBlock>();
-        private readonly SortedList<Range, IWriteBlock> writeBlocks = new SortedList<Range, IWriteBlock>();
+        private readonly RangeStartComparer rangeComparer = new RangeStartComparer();
+
+        private readonly SortedList<Range, IModifyBlock> modifyBlocks;
+        private readonly SortedList<Range, IReadBlock> readBlocks;
+        private readonly SortedList<Range, IWriteBlock> writeBlocks;
 
         public int AddressSpace { get; }
 
         public MemoryController(int addressSpace)
         {
             AddressSpace = addressSpace;
+
+            modifyBlocks = new SortedList<Range, IModifyBlock>(rangeComparer);
+            readBlocks = new SortedList<Range, IReadBlock>(rangeComparer);
+            writeBlocks = new SortedList<Range, IWriteBlock>(rangeComparer);
         }
 
         public void AddBlock<TBlock>(Range range, TBlock block)
-            where TBlock : IReadBlock, IModifyBlock, IWriteBlock
+            where TBlock : class
         {
             if (block is IReadBlock readBlock)
                 readBlocks.Add(range, readBlock);
@@ -68,6 +74,8 @@ namespace Dame.Memory
             toBeCast[0] = block1.Read(address - offset);
             toBeCast[1] = block2.Read(address + 1 - offset);
             
+            // GB stores 16-bit values as little-endian, so we need to 
+            // accomodate if the host prefers it the other way
             if (!BitConverter.IsLittleEndian)
                 toBeCast.Reverse();
             
@@ -94,8 +102,8 @@ namespace Dame.Memory
                 || !GetBlock(writeBlocks, address + 1, out block2, out offset, out _))
                 throw new AccessViolationException($"Address (16-bit) {address} cannot be written to!");
 
-            block1.Write(address - offset, (byte)(value >> 4));
-            block2.Write(address + 1 - offset, (byte)(value << 4));
+            block1.Write(address - offset, (byte)(value & 0x00FF));
+            block2.Write(address + 1 - offset, (byte)(value >> 8));
         }
 
         #endregion
