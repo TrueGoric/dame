@@ -1,4 +1,4 @@
-namespace Dame.Interfaces
+namespace Dame.Peripherals
 {
     interface IScreen
     {
