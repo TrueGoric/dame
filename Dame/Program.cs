@@ -1,16 +1,15 @@
 ﻿using System;
-
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using Dame.Memory.Blocks;
 namespace Dame
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var context = new Architecture.ProcessorExecutionContext();
-            var state = new EmulationState(new byte[0xFFFF]);
-            var memory = new Memory.MemoryController(0xFFFF);
             
-            var processor = new Processor.Processor(state, memory, context);
         }
     }
 }

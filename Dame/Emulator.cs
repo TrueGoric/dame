@@ -1,7 +1,0 @@
-namespace Dame
-{
-    class Emulator
-    {
-        
-    }
-}
