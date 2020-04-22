@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using Dame.Renderer;
 using SFML.Graphics;
 using SFML.Window;
-using static SFML.Window.Keyboard;
 
 namespace Dame
 {
@@ -10,10 +10,14 @@ namespace Dame
     {
         private uint dpiMultiplier;
         private RenderWindow window;
+        private SFMLRenderer emulatorRenderer;
+
+        public SFMLRenderer EmulatorRenderer => emulatorRenderer;
 
         public EmulatorWindow(uint dpi)
         {
             dpiMultiplier = dpi;
+            emulatorRenderer = new SFMLRenderer();
         }
 
         public Task RunAsync()
@@ -34,13 +38,15 @@ namespace Dame
             {
                 window.WaitAndDispatchEvents();
 
+                window.Draw(emulatorRenderer);
+
                 window.Display();
             }
         }
 
         private void OnKeyPressed(object sender, KeyEventArgs e)
         {
-            if (e.Code == Key.Escape)
+            if (e.Code == Keyboard.Key.Escape)
             {
                 window.Close();
             }

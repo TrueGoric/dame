@@ -3,8 +3,9 @@ using Dame.Emulator.Graphics.Rendering;
 
 namespace Dame.Renderer
 {
-    public class SFMLTexture : ITexture
+    internal class SFMLTexture : ITexture
     {
+        private readonly SFMLRenderer renderer;
         public int Width => throw new NotImplementedException();
 
         public int Height => throw new NotImplementedException();
@@ -17,7 +18,10 @@ namespace Dame.Renderer
 
         public void WriteRawData(Span<byte> data)
         {
-            throw new NotImplementedException();
+            lock (renderer.RenderLock)
+            {
+                
+            }
         }
     }
 }
