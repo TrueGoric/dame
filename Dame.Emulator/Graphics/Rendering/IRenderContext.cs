@@ -10,8 +10,7 @@ namespace Dame.Graphics.Rendering
         IDisplayMap Background { get; }
         IDisplayMap Window { get; }
 
-        IList<(int, byte)> SCXSwitches { get; }
-        IList<(int, byte)> SCYSwitches { get; }
+        IList<(int, GraphicsFlags)> RegisterSwitches { get; }
 
 
         // TODO: set properties relating to window position, etc.

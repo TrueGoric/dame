@@ -8,6 +8,6 @@ namespace Dame.Graphics.Rendering
         ITexture this[ushort index] { get; }
         ITexture this[byte x, byte y] { get; }
 
-        void WriteRawTileData(Span<byte> data);
+        void WriteRawTileData(Span<byte> data, int offset = 0);
     }
 }
