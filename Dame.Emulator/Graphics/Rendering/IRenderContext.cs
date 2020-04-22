@@ -10,9 +10,6 @@ namespace Dame.Emulator.Graphics.Rendering
         IDisplayMap Background { get; }
         IDisplayMap Window { get; }
 
-        IList<(int, GraphicsFlags)> RegisterSwitches { get; }
-
-
-        // TODO: set properties relating to window position, etc.
+        void RegisterSwap(Vector2 position, GraphicsData data);
     }
 }
