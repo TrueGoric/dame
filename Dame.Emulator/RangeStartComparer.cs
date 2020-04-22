@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Dame
+namespace Dame.Emulator
 {
     internal class RangeStartComparer : Comparer<Range>
     {

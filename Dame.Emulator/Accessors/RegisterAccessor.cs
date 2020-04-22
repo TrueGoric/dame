@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
-using Dame.Processor;
+using Dame.Emulator.Processor;
 
-namespace Dame.Accessors
+namespace Dame.Emulator.Accessors
 {
     public sealed class RegisterAccessor
     {

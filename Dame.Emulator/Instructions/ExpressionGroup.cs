@@ -1,4 +1,4 @@
-namespace Dame.Instructions
+namespace Dame.Emulator.Instructions
 {
     public enum ExpressionGroup
     {

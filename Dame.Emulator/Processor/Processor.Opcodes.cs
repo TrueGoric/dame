@@ -1,11 +1,11 @@
 using System;
-using Dame.Accessors;
-using Dame.Memory;
-using Dame.Instructions;
+using Dame.Emulator.Accessors;
+using Dame.Emulator.Memory;
+using Dame.Emulator.Instructions;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Dame.Processor
+namespace Dame.Emulator.Processor
 {
     public sealed partial class Processor
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Dame.Memory.Blocks
+namespace Dame.Emulator.Memory.Blocks
 {
     public sealed class RandomAccessMemoryBlock : IModifyBlock
     {

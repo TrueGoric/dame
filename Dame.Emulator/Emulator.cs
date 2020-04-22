@@ -1,4 +1,4 @@
-namespace Dame
+namespace Dame.Emulator
 {
     public class Emulator
     {

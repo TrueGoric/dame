@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Dame.Memory;
+using Dame.Emulator.Memory;
 
-namespace Dame.Accessors
+namespace Dame.Emulator.Accessors
 {
     public sealed class AssemblyAccessor : MemoryAccessor
     {

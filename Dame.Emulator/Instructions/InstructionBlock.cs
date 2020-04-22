@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Dame.Accessors;
-using Dame.Architecture;
-using Dame.Memory;
-using Dame.Processor;
+using Dame.Emulator.Accessors;
+using Dame.Emulator.Architecture;
+using Dame.Emulator.Memory;
+using Dame.Emulator.Processor;
 
-namespace Dame.Instructions
+namespace Dame.Emulator.Instructions
 {
     public sealed partial class InstructionBlock
     {

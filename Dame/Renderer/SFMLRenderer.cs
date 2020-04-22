@@ -1,5 +1,5 @@
 using System;
-using Dame.Graphics.Rendering;
+using Dame.Emulator.Graphics.Rendering;
 
 namespace Dame.Renderer
 {

@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace Dame.Memory.Blocks
+namespace Dame.Emulator.Memory.Blocks
 {
     public sealed class ReadOnlyMemoryBlock : IReadBlock
     {

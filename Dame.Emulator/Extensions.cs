@@ -1,6 +1,6 @@
-using Dame.Processor;
+using Dame.Emulator.Processor;
 
-namespace Dame
+namespace Dame.Emulator
 {
     internal static class Extensions
     {

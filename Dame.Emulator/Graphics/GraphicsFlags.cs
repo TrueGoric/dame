@@ -1,6 +1,6 @@
 using System;
 
-namespace Dame.Graphics
+namespace Dame.Emulator.Graphics
 {
     public enum GraphicsFlags
     {

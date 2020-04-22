@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Dame.Graphics;
-using Dame.Graphics.Rendering;
+using Dame.Emulator.Graphics;
+using Dame.Emulator.Graphics.Rendering;
 
 namespace Dame.Renderer
 {

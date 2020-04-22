@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Threading;
 
-namespace Dame.Architecture
+namespace Dame.Emulator.Architecture
 {
     public delegate void TickHandler();
 

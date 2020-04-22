@@ -1,7 +1,7 @@
 using System;
-using Dame.Graphics.Rendering;
+using Dame.Emulator.Graphics.Rendering;
 
-namespace Dame.Graphics
+namespace Dame.Emulator.Graphics
 {
     public class Graphics
     {

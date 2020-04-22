@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Dame.Graphics.Rendering
+namespace Dame.Emulator.Graphics.Rendering
 {
     public interface ITextureMap
     {

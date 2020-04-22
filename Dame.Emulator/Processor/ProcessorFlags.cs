@@ -1,4 +1,4 @@
-namespace Dame.Processor
+namespace Dame.Emulator.Processor
 {
     public enum ProcessorFlags : byte
     {

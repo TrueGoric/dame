@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Dame.Accessors;
-using Dame.Memory.Blocks;
+using Dame.Emulator.Accessors;
+using Dame.Emulator.Memory.Blocks;
 
-namespace Dame.Memory
+namespace Dame.Emulator.Memory
 {
     public sealed class MemoryController
     {

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Dame.Accessors;
-using Dame.Architecture;
+using Dame.Emulator.Accessors;
+using Dame.Emulator.Architecture;
 using Dame.Exceptions;
-using Dame.Instructions;
-using Dame.Memory;
+using Dame.Emulator.Instructions;
+using Dame.Emulator.Memory;
 
-namespace Dame.Processor
+namespace Dame.Emulator.Processor
 {
     public sealed partial class Processor
     {
