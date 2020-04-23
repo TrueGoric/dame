@@ -4,6 +4,8 @@ namespace Dame.Emulator.Graphics
 {
     public readonly struct GraphicsData : IEquatable<GraphicsData>
     {
+        public LCDControl LCDC { get; }
+        
         public byte SCY { get; }
         public byte SCX { get; }
 
