@@ -3,14 +3,14 @@ using Dame.Emulator.Memory.Blocks;
 
 namespace Dame.Emulator.Graphics.Blocks
 {
-    public class VideoRAMMemoryBlock : IModifyBlock, IWriteBatchBlock, IEmulationState
+    public class VideoMemoryBlock : IModifyBlock, IWriteBatchBlock, IEmulationState
     {
         private readonly Graphics graphics;
 
         private byte nullByte = 0x00;
         private byte[] memory;
 
-        public VideoRAMMemoryBlock(Graphics graphics, int size)
+        public VideoMemoryBlock(Graphics graphics, int size)
         {
             this.graphics = graphics;
             this.memory = new byte[size];
