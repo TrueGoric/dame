@@ -1,6 +1,6 @@
 using System;
 
-namespace Dame.Exceptions
+namespace Dame.Emulator.Exceptions
 {
     public class InstructionNotImplementedException : Exception
     {
