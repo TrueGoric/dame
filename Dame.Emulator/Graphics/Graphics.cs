@@ -11,6 +11,8 @@ namespace Dame.Emulator.Graphics
         private int currentLine;
         private int ticksSinceStateChange;
 
+        public GraphicsMode CurrentState => currentState;
+
         public Graphics(IRenderer renderer)
         {
             this.renderer = renderer;
