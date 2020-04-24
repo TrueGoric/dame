@@ -113,7 +113,7 @@ namespace Dame.Emulator.Memory
         private bool GetBlock<TBlock>(SortedList<Range, TBlock> blocks, int address, out TBlock block, out int offset, out int length)
             where TBlock : class
         {
-            // TODO: optimize using binary search trees and custom range lookup classes
+            // TODO: optimize using binary search trees and custom range lookup classes (OR, even better, compiled jumptables!)
             foreach (var currentBlock in blocks)
             {
                 (offset, length) = currentBlock.Key.GetOffsetAndLength(AddressSpace);
