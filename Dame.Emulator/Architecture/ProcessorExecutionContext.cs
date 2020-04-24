@@ -1,10 +1,9 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
 namespace Dame.Emulator.Architecture
 {
-    public delegate void TickHandler();
-
     public class ProcessorExecutionContext
     {
         #region Default Frequencies
@@ -20,7 +19,7 @@ namespace Dame.Emulator.Architecture
         private long lastSync;
         private long tick; // TODO: handle overflow
 
-        public event TickHandler Tick;
+        private List<ISynchronizable> synchronizables = new List<ISynchronizable>();
 
         /// <summary>
         /// Base clock frequency, used as a foundation for
@@ -29,6 +28,12 @@ namespace Dame.Emulator.Architecture
         /// <value>Clock frequency in Hz.</value>
         public uint Frequency { get; set; } = Freq1MHz;
 
+        public void Register(ISynchronizable synchronizable)
+        {
+            if (!synchronizables.Contains(synchronizable))
+                synchronizables.Add(synchronizable);
+        }
+
         public void Start()
         {
             tick = 0;
@@ -36,24 +41,28 @@ namespace Dame.Emulator.Architecture
             stopwatch.Restart();
         }
 
-        public void Step()
+        public void Cycle(int cycles = 1)
         {
-                Tick?.Invoke();
-                ++tick;
+            // TODO: use compiled expressions for faster execution (eliminating callvirt)
+            
+            foreach (var synchronizable in synchronizables)
+                synchronizable.Cycle(cycles);
+
+            ++tick;
         }
 
         public void SyncWait()
         {
             var tickFrequency = Stopwatch.Frequency;
             var ticksPerCycle = Frequency != FreqUnlimited
-                ? tickFrequency / (long) Frequency
+                ? tickFrequency / (long)Frequency
                 : 0;
-            
+
             var syncTime = ticksPerCycle * (tick - lastSync);
-            
+
             while (syncTime < stopwatch.ElapsedTicks)
-                    spinWait.SpinOnce();
-            
+                spinWait.SpinOnce();
+
             stopwatch.Restart();
             lastSync = tick;
         }
