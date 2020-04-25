@@ -56,6 +56,7 @@ namespace Dame.Emulator.Processor
 
         private void MapOpcodes()
         {
+            // TODO: write tests -_-
             var vars = new InstructionVariableManager();
 
             #region Control instructions
@@ -1121,6 +1122,7 @@ namespace Dame.Emulator.Processor
             this.opcodes[0x17] = new InstructionBuilder(0x17, "RLA", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<byte>("VAL8"), () => registers.A)
+                    .WriteFlags         (() => registers.Flags)
                     .RotateLeft<byte>   (vars.Get<byte>("VAL8"), false)
                     .UnsetFlags         (ProcessorFlags.Zero)
                     .ReadFlags          (flags => registers.SetFlags(flags))
@@ -1145,6 +1147,7 @@ namespace Dame.Emulator.Processor
                 this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .WriteFlags         (() => registers.Flags)
                         .RotateLeft<byte>   (vars.Get<byte>("VAL8"), false)
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
@@ -1156,6 +1159,7 @@ namespace Dame.Emulator.Processor
             this.opcodes[0x1F] = new InstructionBuilder(0x1F, "RRCA", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<byte>("VAL8"), () => registers.A)
+                    .WriteFlags         (() => registers.Flags)
                     .RotateRight<byte>  (vars.Get<byte>("VAL8"), false)
                     .UnsetFlags         (ProcessorFlags.Zero)
                     .ReadFlags          (flags => registers.SetFlags(flags))
@@ -1180,6 +1184,7 @@ namespace Dame.Emulator.Processor
                 this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
+                        .WriteFlags         (() => registers.Flags)
                         .RotateRight<byte>  (vars.Get<byte>("VAL8"), false)
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)

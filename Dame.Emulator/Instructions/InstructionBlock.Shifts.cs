@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using Dame.Emulator.Accessors;
 using Dame.Emulator.Memory;
 using Dame.Emulator.Processor;
+// TODO: using static System.Linq.Expressions.Expression; and make it a bit more readable
 
 namespace Dame.Emulator.Instructions
 {
@@ -45,7 +46,7 @@ namespace Dame.Emulator.Instructions
 
             variables.Add(variable);
             
-            var size = sizeof(T) * 4;
+            var size = sizeof(T) * 8;
             var lowMask = 1;
             var highMask = 1 << (size - 1);
 
@@ -60,7 +61,7 @@ namespace Dame.Emulator.Instructions
                 carryVariable,
                 Expression.GreaterThan(
                     Expression.And(variable, Expression.Convert(Expression.Constant(highMask), typeof(T))),
-                    Expression.Constant((byte)0)
+                    Expression.Constant(default(T))
                 )
             )));
 
@@ -93,7 +94,7 @@ namespace Dame.Emulator.Instructions
 
             variables.Add(variable);
             
-            var size = sizeof(T) * 4;
+            var size = sizeof(T) * 8;
             var lowMask = 1;
             var highMask = 1 << (size - 1);
 
@@ -141,7 +142,7 @@ namespace Dame.Emulator.Instructions
 
             variables.Add(variable);
             
-            var size = sizeof(T) * 4;
+            var size = sizeof(T) * 8;
             var lowMask = 1;
             var highMask = 1 << (size - 1);
             var nearLowMask = lowMask << 1;
@@ -185,7 +186,7 @@ namespace Dame.Emulator.Instructions
 
             variables.Add(variable);
             
-            var size = sizeof(T) * 4;
+            var size = sizeof(T) * 8;
             var lowMask = 1;
             var highMask = 1 << (size - 1);
             var nearHighMask = highMask >> 1;
