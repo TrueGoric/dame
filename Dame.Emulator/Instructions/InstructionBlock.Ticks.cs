@@ -11,12 +11,11 @@ namespace Dame.Emulator.Instructions
 {
     public sealed partial class InstructionBlock
     {
-        private static readonly MethodInfo stepMethod = typeof(ProcessorExecutionContext).GetMethod(nameof(ProcessorExecutionContext.Step));
+        private static readonly MethodInfo stepMethod = typeof(ProcessorExecutionContext).GetMethod(nameof(ProcessorExecutionContext.Cycle));
 
         public InstructionBlock Cycle(int cycles = 1)
         {
-            for (int i = 0; i < cycles; i++)
-                expressions.Add((ExpressionGroup.Synchronization, Expression.Call(Expression.Constant(context), stepMethod)));
+            expressions.Add((ExpressionGroup.Synchronization, Expression.Call(Expression.Constant(context), stepMethod, Expression.Constant(cycles))));
 
             return this;
         }
