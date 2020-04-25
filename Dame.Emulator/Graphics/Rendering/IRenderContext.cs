@@ -4,12 +4,11 @@ namespace Dame.Emulator.Graphics.Rendering
 {
     public interface IRenderContext
     {
-        ITextureMap TileMap { get; }
-        ITextureMap SpriteMap { get; }
+        ITextureMap TileData { get; }
 
-        IDisplayMap Background { get; }
-        IDisplayMap Window { get; }
+        IDisplayMap TileMapTwo { get; }
+        IDisplayMap TileMapOne { get; }
 
-        void RegisterSwap(Vector2 position, GraphicsData data);
+        void RegisterSwitch(Position position, GraphicsDataRegister data, byte value);
     }
 }
