@@ -11,25 +11,24 @@ namespace Dame.Emulator.Processor
     public sealed partial class Processor
     {
         private ProcessorExecutionContext cpuContext;
-        private EmulationState currentState;
+        private RegisterBank registers;
         private MemoryController memoryController;
 
-        private RegisterAccessor registers;
         private AssemblyAccessor assembly;
 
         private Dictionary<int, Instruction> opcodes;
 
-        public Processor(EmulationState state, MemoryController memory, ProcessorExecutionContext context)
+        public Processor(RegisterBank registerBank, MemoryController memory, ProcessorExecutionContext context)
         {
-            currentState = state;
+            registers = registerBank;
             memoryController = memory;
             cpuContext = context;
 
-            registers = new RegisterAccessor(currentState);
             assembly = new AssemblyAccessor(memoryController, registers);
 
             opcodes = new Dictionary<int, Instruction>();
 
+            InitRegisters();
             MapOpcodes();
         }
 
@@ -60,10 +59,19 @@ namespace Dame.Emulator.Processor
             if (!opcodes.TryGetValue(opcode, out instruction))
                 throw new InstructionNotImplementedException(opcode);
 
-            //Console.WriteLine(instruction.Name);
+            // Console.WriteLine(instruction.Name);
             
             instruction.Invoker();
         }
 
+        private void InitRegisters()
+        {
+            registers.AF = 0x01B0;
+            registers.BC = 0x0013;
+            registers.DE = 0x00D8;
+            registers.HL = 0x014D;
+
+            registers.SP = 0xFFFE;
+        }
     }
 }

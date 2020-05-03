@@ -2,12 +2,13 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Dame.Emulator.Memory;
+using Dame.Emulator.Processor;
 
 namespace Dame.Emulator.Accessors
 {
     public sealed class AssemblyAccessor : MemoryAccessor
     {
-        private readonly RegisterAccessor registerAccessor;
+        private readonly RegisterBank registerAccessor;
 
         public override int Location
         {
@@ -15,7 +16,7 @@ namespace Dame.Emulator.Accessors
             set => registerAccessor.PC = (ushort)value; // TODO: overflow check?
         }
 
-        public AssemblyAccessor(MemoryController controller, RegisterAccessor registers)
+        public AssemblyAccessor(MemoryController controller, RegisterBank registers)
             : base(controller)
         {
             registerAccessor = registers;
