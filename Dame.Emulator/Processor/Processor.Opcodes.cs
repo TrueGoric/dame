@@ -66,6 +66,12 @@ namespace Dame.Emulator.Processor
                 .With(b => b
                     .Cycle  ())
                 .Compile());
+
+            // temp
+            this.opcodes.Add(0xF3, new InstructionBuilder(0xF3, "DI", cpuContext)
+                .With(b => b
+                    .Cycle  ())
+                .Compile());
             
             #endregion
 
