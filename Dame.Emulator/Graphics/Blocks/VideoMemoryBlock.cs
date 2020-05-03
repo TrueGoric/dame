@@ -13,7 +13,7 @@ namespace Dame.Emulator.Graphics.Blocks
         private byte[] memory;
 
         public bool BufferModified { get; private set; }
-        public ReadOnlySpan<byte> Raw => new ReadOnlySpan<byte>(memory);
+        public ReadOnlySpan<byte> Raw => new ReadOnlySpan<byte>(memory, bufferOffset, memory.Length / 2);
 
         public VideoMemoryBlock(IGraphics graphics, int size)
         {

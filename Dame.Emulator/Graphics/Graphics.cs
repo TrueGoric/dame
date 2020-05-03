@@ -129,6 +129,8 @@ namespace Dame.Emulator.Graphics
 
             if (currentPos == Position.Zero)
             {
+                renderer.RenderContext.ClearSwitches();
+                
                 renderer.RenderContext.RegisterSwitch(Position.Zero, GraphicsDataRegister.LCDC, (byte)Registers.LCDC);
                 renderer.RenderContext.RegisterSwitch(Position.Zero, GraphicsDataRegister.SCY, Registers.SCY);
                 renderer.RenderContext.RegisterSwitch(Position.Zero, GraphicsDataRegister.SCX, Registers.SCX);

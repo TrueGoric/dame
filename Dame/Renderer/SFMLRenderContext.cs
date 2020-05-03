@@ -14,20 +14,38 @@ namespace Dame.Renderer
     {
         private readonly SFMLRenderer renderer;
 
-        private Queue<(Vector2 Position, GraphicsData Data)> registerSwap;
+        public Queue<GraphicsDataSwitch> RegisterSwapQueue = new Queue<GraphicsDataSwitch>();
 
-        public ITextureMap TileMap => throw new NotImplementedException();
+        public IRenderData TileData => SFMLTileData;
 
-        public ITextureMap SpriteMap => throw new NotImplementedException();
+        public IRenderData TileMapOne => SFMLTileMapOne;
+        public IRenderData TileMapTwo => SFMLTileMapTwo;
 
-        public IDisplayMap Background => throw new NotImplementedException();
+        public SFMLTextureMap SFMLTileData { get; }
+        
+        public SFMLDisplayMap SFMLTileMapOne { get; }
+        public SFMLDisplayMap SFMLTileMapTwo { get; }
 
-        public IDisplayMap Window => throw new NotImplementedException();
+        public SFMLRenderContext(SFMLRenderer renderer)
+        {
+            this.renderer = renderer;
 
-        public void RegisterSwap(Vector2 position, GraphicsData data)
+            SFMLTileData = new SFMLTextureMap(renderer);
+
+            SFMLTileMapOne = new SFMLDisplayMap(renderer);
+            SFMLTileMapTwo = new SFMLDisplayMap(renderer);
+        }
+
+        public void RegisterSwitch(Position position, GraphicsDataRegister data, byte value)
         {
             lock (renderer.RenderLock)
-                registerSwap.Enqueue((position, data));
+                RegisterSwapQueue.Enqueue(new GraphicsDataSwitch(position, data, value));
+        }
+
+        public void ClearSwitches()
+        {
+            lock (renderer.RenderLock)
+                RegisterSwapQueue.Clear();
         }
     }
 }

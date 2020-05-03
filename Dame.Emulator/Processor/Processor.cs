@@ -37,7 +37,12 @@ namespace Dame.Emulator.Processor
         {
             int opcode;
 
+            // Console.Write($"{registers.PC.ToString("X")} :: ");
+
             opcode = assembly.Read();
+
+            if (registers.PC >= 0x21)
+                opcode = opcode;
 
             if (opcode == 0xCB)
             {
@@ -55,6 +60,8 @@ namespace Dame.Emulator.Processor
             if (!opcodes.TryGetValue(opcode, out instruction))
                 throw new InstructionNotImplementedException(opcode);
 
+            //Console.WriteLine(instruction.Name);
+            
             instruction.Invoker();
         }
 

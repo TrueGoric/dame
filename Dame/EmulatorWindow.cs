@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Dame.Renderer;
 using SFML.Graphics;
 using SFML.Window;
+using static Dame.Renderer.RenderingConstants;
 
 namespace Dame
 {
@@ -28,8 +29,8 @@ namespace Dame
             var mode = VideoMode.DesktopMode;
             var style = Styles.Default;
 
-            mode.Width = 160 * dpiMultiplier;
-            mode.Height = 144 * dpiMultiplier;
+            mode.Width = BackbufferWidth * dpiMultiplier;
+            mode.Height = BackbufferHeight * dpiMultiplier;
 
             window = new RenderWindow(mode, "Dame", style);
             window.KeyPressed += OnKeyPressed;
@@ -37,6 +38,8 @@ namespace Dame
             while (window.IsOpen)
             {
                 window.WaitAndDispatchEvents();
+
+                window.Clear(Color.White);
 
                 window.Draw(emulatorRenderer);
 

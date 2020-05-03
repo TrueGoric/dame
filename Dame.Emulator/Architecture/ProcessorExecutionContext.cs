@@ -28,6 +28,8 @@ namespace Dame.Emulator.Architecture
         /// <value>Clock frequency in Hz.</value>
         public uint Frequency { get; set; } = Freq1MHz;
 
+        public long Ticks => tick;
+
         public void Register(ISynchronizable synchronizable)
         {
             if (!synchronizables.Contains(synchronizable))
@@ -44,7 +46,7 @@ namespace Dame.Emulator.Architecture
         public void Cycle(int cycles = 1)
         {
             // TODO: use compiled expressions for faster execution (eliminating callvirt)
-            
+
             foreach (var synchronizable in synchronizables)
                 synchronizable.Cycle(cycles);
 
