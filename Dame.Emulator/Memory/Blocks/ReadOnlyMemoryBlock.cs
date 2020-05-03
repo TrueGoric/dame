@@ -5,11 +5,13 @@ namespace Dame.Emulator.Memory.Blocks
 {
     public sealed class ReadOnlyMemoryBlock : IReadBlock
     {
-        private readonly Memory<byte> memory;
+        private byte[] memory;
 
-        public ReadOnlyMemoryBlock(Memory<byte> memory)
+        public byte[] Memory => memory;
+
+        public ReadOnlyMemoryBlock(int size)
         {
-            this.memory = memory;
+            this.memory = new byte[size];
         }
 
         public byte Read(int address)
@@ -17,7 +19,7 @@ namespace Dame.Emulator.Memory.Blocks
             if (address >= memory.Length)
                 throw new ArgumentException($"Address {address} is out of bounds!", nameof(address));
 
-            return memory.Span[address];
+            return memory[address];
         }
     }
 }

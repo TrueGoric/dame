@@ -37,13 +37,13 @@ namespace Dame
             var logoSpan = new Span<byte>(state.Memory, 0x0104, 0x30);
             logo.CopyTo(logoSpan);
 
-            var bootRom = new ReadOnlyMemoryBlock(new Memory<byte>(state.Memory, 0x0, 0x0100));
-            var tempRom = new ReadOnlyMemoryBlock(new Memory<byte>(state.Memory, 0x0100, 0x7F00));
+            var bootRom = new ReadOnlyMemoryBlock(0x0100);
+            var tempRom = new ReadOnlyMemoryBlock(0x7F00);
 
-            var ram = new RandomAccessMemoryBlock(new Memory<byte>(state.Memory, 0xC000, 0x2000));
-            var hRam = new RandomAccessMemoryBlock(new Memory<byte>(state.Memory, 0xFF80, 0x007F));
+            var ram = new RandomAccessMemoryBlock(0x2000);
+            var hRam = new RandomAccessMemoryBlock(0x007F);
 
-            var tempSound = new RandomAccessMemoryBlock(new Memory<byte>(state.Memory, 0xFF10, 0x0017));
+            var tempSound = new RandomAccessMemoryBlock(0x0017);
             
             memory.AddBlock(0x0..0x0100, bootRom);
             memory.AddBlock(0x0100..0x8000, tempRom);

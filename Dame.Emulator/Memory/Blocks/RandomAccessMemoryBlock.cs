@@ -4,32 +4,34 @@ namespace Dame.Emulator.Memory.Blocks
 {
     public sealed class RandomAccessMemoryBlock : IModifyBlock
     {
-        private readonly Memory<byte> memory;
+        private byte[] memory;
 
-        public RandomAccessMemoryBlock(Memory<byte> memory)
+        public byte[] Memory => memory;
+
+        public RandomAccessMemoryBlock(int size)
         {
-            this.memory = memory;
+            this.memory = new byte[size];
         }
 
         public ref byte Get(int address)
         {
             ThrowIfOutOfBounds(address);
 
-            return ref memory.Span[address];
+            return ref memory[address];
         }
 
         public byte Read(int address)
         {
             ThrowIfOutOfBounds(address);
 
-            return memory.Span[address];
+            return memory[address];
         }
 
         public void Write(int address, byte value)
         {
             ThrowIfOutOfBounds(address);
 
-            memory.Span[address] = value;
+            memory[address] = value;
         }
 
         private void ThrowIfOutOfBounds(int address)
