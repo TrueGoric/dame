@@ -68,11 +68,11 @@ namespace Dame.Emulator.Instructions
 
         public InstructionBlock Subtract<T>(ParameterExpression variable, Expression<InstructionValue<T>> expression, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
-            => Subtract<T>(variable, expression.Body, withCarry);
+            => Subtract<T>(variable, expression.Body, withCarry, setFlags);
 
         public InstructionBlock Subtract<T>(ParameterExpression variable, T value, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
-            => Subtract<T>(variable, Expression.Constant(value, typeof(T)), withCarry);
+            => Subtract<T>(variable, Expression.Constant(value, typeof(T)), withCarry, setFlags);
 
         public InstructionBlock Subtract<T>(ParameterExpression variable, Expression expression, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
@@ -300,28 +300,40 @@ namespace Dame.Emulator.Instructions
                         Expression.Convert(Expression.And(secondExpression, Expression.Convert(Expression.Constant(mask), secondExpression.Type)), typeof(long))
                     ),
                     Expression.Constant(mask)
-                ); // (variable & mask) + (expressionResult & mask) > mask
+                ); // (first & mask) + (second & mask) > mask
         
         private Expression TestSubCarry<T>(long mask, Expression firstExpression, Expression secondExpression, Expression carryExpression = null)
             where T : unmanaged
-            => Expression.NotEqual(
-                Expression.And(
+        {
+            if (mask == GetMaxValue<T>())
+                return Expression.LessThan(
+                    firstExpression,
                     carryExpression == null
-                    ? WrappedSub<T>(
-                        Expression.And(firstExpression, Expression.Convert(Expression.Constant(mask), typeof(T))),
-                        Expression.And(secondExpression, Expression.Convert(Expression.Constant(mask), typeof(T)))
-                    )
-                    : WrappedSub<T>(
-                        WrappedSub<T>(
-                            Expression.And(firstExpression, Expression.Convert(Expression.Constant(mask), typeof(T))),
-                            Expression.And(secondExpression, Expression.Convert(Expression.Constant(mask), typeof(T)))
+                        ? secondExpression
+                        : WrappedAdd<T>(secondExpression, carryExpression)
+                );
+            else
+                return Expression.NotEqual(
+                    Expression.And(
+                        Expression.Convert(
+                            carryExpression == null
+                            ? WrappedSub<T>(
+                                Expression.And(firstExpression, Expression.Convert(Expression.Constant(mask), typeof(T))),
+                                Expression.And(secondExpression, Expression.Convert(Expression.Constant(mask), typeof(T)))
+                            )
+                            : WrappedSub<T>(
+                                WrappedSub<T>(
+                                    Expression.And(firstExpression, Expression.Convert(Expression.Constant(mask), typeof(T))),
+                                    Expression.And(secondExpression, Expression.Convert(Expression.Constant(mask), typeof(T)))
+                                ),
+                                carryExpression
+                            ), typeof(long)
                         ),
-                        carryExpression
+                        Expression.Constant(mask + 1)
                     ),
-                    Expression.Convert(Expression.Constant(mask + 1), typeof(T))
-                ),
-                Expression.Convert(Expression.Constant(0), typeof(T))
-            );
+                    Expression.Constant(0L)
+                ); // (first & mask - second & mask [- carry]) & (mask + 1) != 0
+        }
         
         private Expression WrappedAdd<T>(Expression leftExpression, Expression rightExpression)
             where T : unmanaged
