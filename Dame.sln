@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dame.Emulator", "Dame.Emula
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dame", "Dame\Dame.csproj", "{A5F2EF39-1660-47C4-AE4C-A29F09AB1687}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dame.Tests", "Dame.Tests\Dame.Tests.csproj", "{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{A5F2EF39-1660-47C4-AE4C-A29F09AB1687}.Release|x64.Build.0 = Release|Any CPU
 		{A5F2EF39-1660-47C4-AE4C-A29F09AB1687}.Release|x86.ActiveCfg = Release|Any CPU
 		{A5F2EF39-1660-47C4-AE4C-A29F09AB1687}.Release|x86.Build.0 = Release|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Debug|x64.Build.0 = Debug|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Debug|x86.Build.0 = Debug|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Release|x64.ActiveCfg = Release|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Release|x64.Build.0 = Release|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Release|x86.ActiveCfg = Release|Any CPU
+		{CFE5BEA6-C63D-46B0-BEA1-6B96A9515D3C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
