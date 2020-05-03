@@ -44,7 +44,7 @@ namespace Dame.Emulator.Memory
             int offset;
 
             if (!GetBlock(modifyBlocks, address, out block, out offset, out _))
-                throw new AccessViolationException($"Address {address.ToString("X")} cannot be read from!");
+                throw new AccessViolationException($"Address 0x{address.ToString("X")} cannot be read from!");
 
             return ref block.Get(address - offset);
         }
@@ -55,7 +55,7 @@ namespace Dame.Emulator.Memory
             int offset;
 
             if (!GetBlock(readBlocks, address, out block, out offset, out _))
-                throw new AccessViolationException($"Address {address.ToString("X")} cannot be read from!");
+                throw new AccessViolationException($"Address 0x{address.ToString("X")} cannot be read from!");
 
             return block.Read(address - offset);
         }
@@ -67,7 +67,7 @@ namespace Dame.Emulator.Memory
 
             if (!GetBlock(readBlocks, address, out block1, out offset, out _)
                 || !GetBlock(readBlocks, address + 1, out block2, out offset, out _))
-                throw new AccessViolationException($"Address (16-bit) {address.ToString("X")} cannot be read from!");
+                throw new AccessViolationException($"Address (16-bit) 0x{address.ToString("X")} cannot be read from!");
 
             Span<byte> toBeCast = stackalloc byte[2];
 
@@ -88,7 +88,7 @@ namespace Dame.Emulator.Memory
             int offset;
 
             if (!GetBlock(writeBlocks, address, out block, out offset, out _))
-                throw new AccessViolationException($"Address {address.ToString("X")} cannot be written to!");
+                throw new AccessViolationException($"Address 0x{address.ToString("X")} cannot be written to!");
 
             block.Write(address - offset, value);
         }
@@ -100,7 +100,7 @@ namespace Dame.Emulator.Memory
 
             if (!GetBlock(writeBlocks, address, out block1, out offset, out _)
                 || !GetBlock(writeBlocks, address + 1, out block2, out offset, out _))
-                throw new AccessViolationException($"Address (16-bit) {address.ToString("X")} cannot be written to!");
+                throw new AccessViolationException($"Address (16-bit) 0x{address.ToString("X")} cannot be written to!");
 
             block1.Write(address - offset, (byte)(value & 0x00FF));
             block2.Write(address + 1 - offset, (byte)(value >> 8));
