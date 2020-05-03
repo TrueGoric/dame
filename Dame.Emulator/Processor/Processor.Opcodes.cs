@@ -61,10 +61,11 @@ namespace Dame.Emulator.Processor
 
             #region Control instructions
 
-            this.opcodes[0x00] = new InstructionBuilder(0x00, "NOP", cpuContext)
+            // NOP
+            this.opcodes.Add(0x00, new InstructionBuilder(0x00, "NOP", cpuContext)
                 .With(b => b
                     .Cycle  ())
-                .Compile();
+                .Compile());
             
             #endregion
 
@@ -78,16 +79,16 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in jpMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input  (vars.Get<ushort>("PTR16"), mapping.Input, mapping.InputCycles)
                         .Output (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                         .Cycle  ())
-                    .Compile();
+                    .Compile());
             }
 
             // JR r8
-            this.opcodes[0x18] = new InstructionBuilder(0x18, "JR r8", cpuContext)
+            this.opcodes.Add(0x18, new InstructionBuilder(0x18, "JR r8", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<sbyte>("R8"), () => assembly.Read().TwosComplement())
                     .Input              (vars.Get<ushort>("PTR16"), () => registers.PC)
@@ -95,10 +96,10 @@ namespace Dame.Emulator.Processor
                     .Cycle              (2)
                     .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                     .Cycle              ())
-                .Compile();
+                .Compile());
 
             // JP NZ, a16
-            this.opcodes[0xC2] = new InstructionBuilder(0xC2, "JP NZ, a16", cpuContext)
+            this.opcodes.Add(0xC2, new InstructionBuilder(0xC2, "JP NZ, a16", cpuContext)
                 .With(b => b
                     .Input          (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
                     .WriteFlags     (() => registers.Flags)
@@ -107,10 +108,10 @@ namespace Dame.Emulator.Processor
                             .Output (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                             .Cycle  ())
                     .Cycle          ())
-                .Compile();
+                .Compile());
             
             // JP Z, a16
-            this.opcodes[0xCA] = new InstructionBuilder(0xCA, "JP Z, a16", cpuContext)
+            this.opcodes.Add(0xCA, new InstructionBuilder(0xCA, "JP Z, a16", cpuContext)
                 .With(b => b
                     .Input          (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
                     .WriteFlags     (() => registers.Flags)
@@ -119,10 +120,10 @@ namespace Dame.Emulator.Processor
                             .Output (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                             .Cycle  ())
                     .Cycle          ())
-                .Compile();
+                .Compile());
             
             // JP NC, a16
-            this.opcodes[0xD2] = new InstructionBuilder(0xD2, "JP NC, a16", cpuContext)
+            this.opcodes.Add(0xD2, new InstructionBuilder(0xD2, "JP NC, a16", cpuContext)
                 .With(b => b
                     .Input          (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
                     .WriteFlags     (() => registers.Flags)
@@ -131,10 +132,10 @@ namespace Dame.Emulator.Processor
                             .Output (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                             .Cycle  ())
                     .Cycle          ())
-                .Compile();
+                .Compile());
             
             // JP C, a16
-            this.opcodes[0xDA] = new InstructionBuilder(0xDA, "JP C, a16", cpuContext)
+            this.opcodes.Add(0xDA, new InstructionBuilder(0xDA, "JP C, a16", cpuContext)
                 .With(b => b
                     .Input          (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
                     .WriteFlags     (() => registers.Flags)
@@ -143,10 +144,10 @@ namespace Dame.Emulator.Processor
                             .Output (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                             .Cycle  ())
                     .Cycle          ())
-                .Compile();
+                .Compile());
             
             // JR NZ, r8
-            this.opcodes[0x20] = new InstructionBuilder(0x20, "JR NZ, r8", cpuContext)
+            this.opcodes.Add(0x20, new InstructionBuilder(0x20, "JR NZ, r8", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<sbyte>("R8"), () => assembly.Read().TwosComplement())
                     .Input              (vars.Get<ushort>("PTR16"), () => registers.PC)
@@ -158,10 +159,10 @@ namespace Dame.Emulator.Processor
                             .Output     (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                             .Cycle      ())
                     .Cycle              ())
-                .Compile();
+                .Compile());
             
             // JR Z, r8
-            this.opcodes[0x28] = new InstructionBuilder(0x28, "JR Z, r8", cpuContext)
+            this.opcodes.Add(0x28, new InstructionBuilder(0x28, "JR Z, r8", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<sbyte>("R8"), () => assembly.Read().TwosComplement())
                     .Input              (vars.Get<ushort>("PTR16"), () => registers.PC)
@@ -173,10 +174,10 @@ namespace Dame.Emulator.Processor
                             .Output     (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                             .Cycle      ())
                     .Cycle              ())
-                .Compile();
+                .Compile());
             
             // JR NC, r8
-            this.opcodes[0x30] = new InstructionBuilder(0x30, "JR NC, r8", cpuContext)
+            this.opcodes.Add(0x30, new InstructionBuilder(0x30, "JR NC, r8", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<sbyte>("R8"), () => assembly.Read().TwosComplement())
                     .Input              (vars.Get<ushort>("PTR16"), () => registers.PC)
@@ -188,10 +189,10 @@ namespace Dame.Emulator.Processor
                             .Output     (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                             .Cycle      ())
                     .Cycle              ())
-                .Compile();
+                .Compile());
             
             // JR C, r8
-            this.opcodes[0x38] = new InstructionBuilder(0x38, "JP C, r8", cpuContext)
+            this.opcodes.Add(0x38, new InstructionBuilder(0x38, "JP C, r8", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<sbyte>("R8"), () => assembly.Read().TwosComplement())
                     .Input              (vars.Get<ushort>("PTR16"), () => registers.PC)
@@ -203,14 +204,14 @@ namespace Dame.Emulator.Processor
                             .Output     (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                             .Cycle      ())
                     .Cycle              ())
-                .Compile();
+                .Compile());
 
             #endregion
 
             #region Call instructions
             
             // CALL a16
-            this.opcodes[0xCD] = new InstructionBuilder(0xCD, "CALL a16", cpuContext)
+            this.opcodes.Add(0xCD, new InstructionBuilder(0xCD, "CALL a16", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
                     // SP -= 2
@@ -224,10 +225,10 @@ namespace Dame.Emulator.Processor
                     // PC = a16
                     .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                     .Cycle              ())
-                .Compile();
+                .Compile());
             
             // CALL NZ, a16
-            this.opcodes[0xC4] = new InstructionBuilder(0xC4, "CALL NZ, a16", cpuContext)
+            this.opcodes.Add(0xC4, new InstructionBuilder(0xC4, "CALL NZ, a16", cpuContext)
                 .With(b => b
                     .Input                      (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
                     .IfFlagsUnset               (ProcessorFlags.Zero,
@@ -243,10 +244,10 @@ namespace Dame.Emulator.Processor
                             // PC = a16
                             .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val)))
                     .Cycle                      ())
-                .Compile();
+                .Compile());
             
             // CALL Z, a16
-            this.opcodes[0xCC] = new InstructionBuilder(0xCC, "CALL Z, a16", cpuContext)
+            this.opcodes.Add(0xCC, new InstructionBuilder(0xCC, "CALL Z, a16", cpuContext)
                 .With(b => b
                     .Input                      (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
                     .IfFlagsSet                 (ProcessorFlags.Zero,
@@ -262,10 +263,10 @@ namespace Dame.Emulator.Processor
                             // PC = a16
                             .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val)))
                     .Cycle                      ())
-                .Compile();
+                .Compile());
             
             // CALL NC, a16
-            this.opcodes[0xD4] = new InstructionBuilder(0xD4, "CALL NC, a16", cpuContext)
+            this.opcodes.Add(0xD4, new InstructionBuilder(0xD4, "CALL NC, a16", cpuContext)
                 .With(b => b
                     .Input                      (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
                     .IfFlagsUnset               (ProcessorFlags.Carry,
@@ -281,10 +282,10 @@ namespace Dame.Emulator.Processor
                             // PC = a16
                             .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val)))
                     .Cycle                      ())
-                .Compile();
+                .Compile());
             
             // CALL C, a16
-            this.opcodes[0xDC] = new InstructionBuilder(0xDC, "CALL C, a16", cpuContext)
+            this.opcodes.Add(0xDC, new InstructionBuilder(0xDC, "CALL C, a16", cpuContext)
                 .With(b => b
                     .Input                      (vars.Get<ushort>("PTR16"), () => assembly.ReadDouble(), 2)
                     .IfFlagsSet                 (ProcessorFlags.Carry,
@@ -300,10 +301,10 @@ namespace Dame.Emulator.Processor
                             // PC = a16
                             .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val)))
                     .Cycle                      ())
-                .Compile();
+                .Compile());
 
             // RET
-            this.opcodes[0xC9] = new InstructionBuilder(0xC9, "RET", cpuContext)
+            this.opcodes.Add(0xC9, new InstructionBuilder(0xC9, "RET", cpuContext)
                 .With(b => b
                     // PC = (SP)
                     .Input              (vars.Get<ushort>("COUNTER16"), () => memoryController.ReadDouble(registers.SP), 2)
@@ -313,10 +314,10 @@ namespace Dame.Emulator.Processor
                     .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
                     .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
                     .Cycle              (2))
-                .Compile();
+                .Compile());
             
             // RET NZ
-            this.opcodes[0xC0] = new InstructionBuilder(0xC0, "RET NZ", cpuContext)
+            this.opcodes.Add(0xC0, new InstructionBuilder(0xC0, "RET NZ", cpuContext)
                 .With(b => b
                     .WriteFlags                 (() => registers.Flags)
                     .IfFlagsUnset               (ProcessorFlags.Zero,
@@ -330,10 +331,10 @@ namespace Dame.Emulator.Processor
                             .Cycle              ()
                             .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val)))
                     .Cycle                      (2))
-                .Compile();
+                .Compile());
             
             // RET Z
-            this.opcodes[0xC8] = new InstructionBuilder(0xC8, "RET Z", cpuContext)
+            this.opcodes.Add(0xC8, new InstructionBuilder(0xC8, "RET Z", cpuContext)
                 .With(b => b
                     .WriteFlags                 (() => registers.Flags)
                     .IfFlagsSet                 (ProcessorFlags.Zero,
@@ -347,10 +348,10 @@ namespace Dame.Emulator.Processor
                             .Cycle              ()
                             .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val)))
                     .Cycle                      (2))
-                .Compile();
+                .Compile());
 
             // RET NC
-            this.opcodes[0xD0] = new InstructionBuilder(0xD0, "RET NC", cpuContext)
+            this.opcodes.Add(0xD0, new InstructionBuilder(0xD0, "RET NC", cpuContext)
                 .With(b => b
                     .WriteFlags                 (() => registers.Flags)
                     .IfFlagsUnset               (ProcessorFlags.Carry,
@@ -364,10 +365,10 @@ namespace Dame.Emulator.Processor
                             .Cycle              ()
                             .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val)))
                     .Cycle                      (2))
-                .Compile();
+                .Compile());
             
             // RET C
-            this.opcodes[0xD8] = new InstructionBuilder(0xD8, "RET C", cpuContext)
+            this.opcodes.Add(0xD8, new InstructionBuilder(0xD8, "RET C", cpuContext)
                 .With(b => b
                     .WriteFlags                 (() => registers.Flags)
                     .IfFlagsSet                 (ProcessorFlags.Carry,
@@ -381,7 +382,7 @@ namespace Dame.Emulator.Processor
                             .Cycle              ()
                             .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val)))
                     .Cycle                      (2))
-                .Compile();
+                .Compile());
 
             var rstMappings = new Mapping<ushort>[]
             {
@@ -398,7 +399,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in rstMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<ushort>("PTR16"), mapping.Input)
                         // SP -= 2
@@ -412,7 +413,7 @@ namespace Dame.Emulator.Processor
                         // PC = a16
                         .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetPC(val))
                         .Cycle              ())
-                .Compile();
+                .Compile());
             }
 
             #endregion
@@ -521,16 +522,16 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in load8Mappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input  (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .Output (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle  ())
-                    .Compile();
+                    .Compile());
             }
 
             // LD (HL+), A
-            this.opcodes[0x22] = new InstructionBuilder(0x22, "LD (HL+), A", cpuContext)
+            this.opcodes.Add(0x22, new InstructionBuilder(0x22, "LD (HL+), A", cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), () => registers.A)
                         .Output             (vars.Get<byte>("VAL8"), (byte val) => memoryController.Write(registers.HL, val), 1)
@@ -538,10 +539,10 @@ namespace Dame.Emulator.Processor
                         .Add<ushort, ushort>(vars.Get<ushort>("HL"), 1)
                         .Output             (vars.Get<ushort>("HL"), (ushort hl) => registers.SetHL(hl))
                         .Cycle              ())
-                    .Compile();
+                    .Compile());
             
             // LD (HL-), A
-            this.opcodes[0x32] = new InstructionBuilder(0x32, "LD (HL-), A", cpuContext)
+            this.opcodes.Add(0x32, new InstructionBuilder(0x32, "LD (HL-), A", cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), () => registers.A)
                         .Output             (vars.Get<byte>("VAL8"), (byte val) => memoryController.Write(registers.HL, val), 1)
@@ -549,10 +550,10 @@ namespace Dame.Emulator.Processor
                         .Subtract<ushort>   (vars.Get<ushort>("HL"), 1)
                         .Output             (vars.Get<ushort>("HL"), (ushort hl) => registers.SetHL(hl))
                         .Cycle              ())
-                    .Compile();
+                    .Compile());
             
             // LD A, (HL+)
-            this.opcodes[0x2A] = new InstructionBuilder(0x2A, "LD A, (HL+)", cpuContext)
+            this.opcodes.Add(0x2A, new InstructionBuilder(0x2A, "LD A, (HL+)", cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), () => memoryController.Read(registers.HL), 1)
                         .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
@@ -560,10 +561,10 @@ namespace Dame.Emulator.Processor
                         .Add<ushort, ushort>(vars.Get<ushort>("HL"), 1)
                         .Output             (vars.Get<ushort>("HL"), (ushort hl) => registers.SetHL(hl))
                         .Cycle              ())
-                    .Compile();
+                    .Compile());
             
             // LD A, (HL-)
-            this.opcodes[0x3A] = new InstructionBuilder(0x3A, "LD A, (HL-)", cpuContext)
+            this.opcodes.Add(0x3A, new InstructionBuilder(0x3A, "LD A, (HL-)", cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), () => memoryController.Read(registers.HL), 1)
                         .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
@@ -571,7 +572,7 @@ namespace Dame.Emulator.Processor
                         .Subtract<ushort>   (vars.Get<ushort>("HL"), 1)
                         .Output             (vars.Get<ushort>("HL"), (ushort hl) => registers.SetHL(hl))
                         .Cycle              ())
-                    .Compile();
+                    .Compile());
 
             #endregion
 
@@ -591,16 +592,16 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in load16Mappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input  (vars.Get<ushort>("VAL16"), mapping.Input, mapping.InputCycles)
                         .Output (vars.Get<ushort>("VAL16"), mapping.Output, mapping.OutputCycles)
                         .Cycle  ())
-                    .Compile();
+                    .Compile());
             }
 
             // LD HL, SP + r8
-            this.opcodes[0xF8] = new InstructionBuilder(0xF8, "LD HL, SP + r8", cpuContext)
+            this.opcodes.Add(0xF8, new InstructionBuilder(0xF8, "LD HL, SP + r8", cpuContext)
                     .With(b => b
                         .Input              (vars.Get<ushort>("VAL16"), () => registers.SP)
                         .Add<ushort, sbyte> (vars.Get<ushort>("VAL16"), () => assembly.Read().TwosComplement())
@@ -609,7 +610,7 @@ namespace Dame.Emulator.Processor
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<ushort>("VAL16"), (ushort val) => registers.SetHL(val))
                         .Cycle              ())
-                    .Compile();
+                    .Compile());
 
             var pushMappings = new Mapping<ushort>[]
             {
@@ -621,7 +622,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in pushMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
                         .Subtract<ushort>   (vars.Get<ushort>("STACK16"), 2)
@@ -630,7 +631,7 @@ namespace Dame.Emulator.Processor
                         .Input              (vars.Get<ushort>("PTR16"), mapping.Input)
                         .Output             (vars.Get<ushort>("PTR16"), (ushort val) => memoryController.WriteDouble(registers.SP, val), 2)
                         .Cycle              ())
-                    .Compile();
+                    .Compile());
             }
 
             var popMappings = new Mapping<ushort>[]
@@ -643,7 +644,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in popMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<ushort>("PTR16"), () => memoryController.ReadDouble(registers.SP), 2)
                         .Output             (vars.Get<ushort>("PTR16"), mapping.Output)
@@ -651,7 +652,7 @@ namespace Dame.Emulator.Processor
                         .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
                         .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
                         .Cycle              ())
-                    .Compile();
+                    .Compile());
             }
 
             #endregion
@@ -672,14 +673,14 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in incMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input          (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .Add<byte, byte>(vars.Get<byte>("VAL8"), 1)
                         .ReadFlags      (flags => registers.SetFlags(flags, ProcessorFlags.Zero | ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry))
                         .Output         (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle          ())
-                    .Compile();
+                    .Compile());
             }
 
             var decMappings = new Mapping<byte>[]
@@ -696,14 +697,14 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in decMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input          (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .Subtract<byte> (vars.Get<byte>("VAL8"), 1)
                         .ReadFlags      (flags => registers.SetFlags(flags, ProcessorFlags.Zero | ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry))
                         .Output         (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle          ())
-                    .Compile();
+                    .Compile());
             }
 
             var addMappings = new Mapping<byte>[]
@@ -722,7 +723,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in addMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                         .Add<byte, byte>(vars.Get<byte>("VAL8"), mapping.Input)
@@ -730,7 +731,7 @@ namespace Dame.Emulator.Processor
                         .ReadFlags      (flags => registers.SetFlags(flags))
                         .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                         .Cycle          ())
-                    .Compile();
+                    .Compile());
             }
 
             var addCarryMappings = new Mapping<byte>[]
@@ -749,7 +750,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in addCarryMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                         .WriteFlags     (() => registers.Flags)
@@ -758,7 +759,7 @@ namespace Dame.Emulator.Processor
                         .ReadFlags      (flags => registers.SetFlags(flags))
                         .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                         .Cycle          ())
-                    .Compile();
+                    .Compile());
             }
 
             var subMappings = new Mapping<byte>[]
@@ -777,7 +778,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in subMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                         .Subtract<byte> (vars.Get<byte>("VAL8"), mapping.Input)
@@ -785,7 +786,7 @@ namespace Dame.Emulator.Processor
                         .ReadFlags      (flags => registers.SetFlags(flags))
                         .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                         .Cycle          ())
-                    .Compile();
+                    .Compile());
             }
 
             var subCarryMappings = new Mapping<byte>[]
@@ -804,7 +805,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in subCarryMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                         .WriteFlags     (() => registers.Flags)
@@ -813,7 +814,7 @@ namespace Dame.Emulator.Processor
                         .ReadFlags      (flags => registers.SetFlags(flags))
                         .Output         (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                         .Cycle          ())
-                    .Compile();
+                    .Compile());
             }
 
             var andMappings = new Mapping<byte>[]
@@ -832,7 +833,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in andMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                         .And<byte>  (vars.Get<byte>("VAL8"), mapping.Input)
@@ -840,7 +841,7 @@ namespace Dame.Emulator.Processor
                         .ReadFlags  (flags => registers.SetFlags(flags))
                         .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                         .Cycle      ())
-                    .Compile();
+                    .Compile());
             }
 
             var xorMappings = new Mapping<byte>[]
@@ -859,7 +860,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in xorMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                         .Xor<byte>  (vars.Get<byte>("VAL8"), mapping.Input)
@@ -867,7 +868,7 @@ namespace Dame.Emulator.Processor
                         .ReadFlags  (flags => registers.SetFlags(flags))
                         .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                         .Cycle      ())
-                    .Compile();
+                    .Compile());
             }
 
             var orMappings = new Mapping<byte>[]
@@ -886,7 +887,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in orMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input      (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                         .Or<byte>   (vars.Get<byte>("VAL8"), mapping.Input)
@@ -894,7 +895,7 @@ namespace Dame.Emulator.Processor
                         .ReadFlags  (flags => registers.SetFlags(flags))
                         .Output     (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                         .Cycle      ())
-                    .Compile();
+                    .Compile());
             }
 
             var cpMappings = new Mapping<byte>[]
@@ -913,18 +914,18 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in cpMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input          (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                         .Subtract<byte> (vars.Get<byte>("VAL8"), mapping.Input)
                         .Cycle          (mapping.InputCycles)
                         .ReadFlags      (flags => registers.SetFlags(flags))
                         .Cycle          ())
-                    .Compile();
+                    .Compile());
             }
 
             // DAA
-            this.opcodes[0x27] = new InstructionBuilder(0x27, "DAA", cpuContext)
+            this.opcodes.Add(0x27, new InstructionBuilder(0x27, "DAA", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                     .WriteFlags         (() => registers.Flags)
@@ -932,10 +933,10 @@ namespace Dame.Emulator.Processor
                     .ReadFlags          (flags => registers.SetFlags(flags, ProcessorFlags.Zero | ProcessorFlags.HalfCarry | ProcessorFlags.Carry))
                     .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                     .Cycle              ())
-                .Compile();
+                .Compile());
             
             // CPL
-            this.opcodes[0x2F] = new InstructionBuilder(0x2F, "CPL", cpuContext)
+            this.opcodes.Add(0x2F, new InstructionBuilder(0x2F, "CPL", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<byte>("VAL8"), () => registers.Accumulator)
                     .WriteFlags         (() => registers.Flags)
@@ -943,20 +944,20 @@ namespace Dame.Emulator.Processor
                     .ReadFlags          (flags => registers.SetFlags(flags, ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry))
                     .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetAccumulator(val))
                     .Cycle              ())
-                .Compile();
+                .Compile());
             
             // SCF
-            this.opcodes[0x37] = new InstructionBuilder(0x37, "SCF", cpuContext)
+            this.opcodes.Add(0x37, new InstructionBuilder(0x37, "SCF", cpuContext)
                 .With(b => b
                     .WriteFlags         (() => registers.Flags)
                     .SetFlags           (ProcessorFlags.Carry)
                     .ReadFlags          (flags => registers.SetFlags(flags, ProcessorFlags.Carry))
                     .Cycle              ())
-                .Compile();
+                .Compile());
             
             // CCF
             // this could've been done better, but why waste a good opportunity to test out conditional expressions?
-            this.opcodes[0x3F] = new InstructionBuilder(0x3F, "CCF", cpuContext)
+            this.opcodes.Add(0x3F, new InstructionBuilder(0x3F, "CCF", cpuContext)
                 .With(b => b
                     .WriteFlags         (() => registers.Flags)
                     .IfFlagsSet         (ProcessorFlags.Carry,
@@ -967,7 +968,7 @@ namespace Dame.Emulator.Processor
                     .UnsetFlags         (ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry)
                     .ReadFlags          (flags => registers.SetFlags(flags, ProcessorFlags.Arithmetic | ProcessorFlags.HalfCarry | ProcessorFlags.Carry))
                     .Cycle              ())
-                .Compile();
+                .Compile());
 
             #endregion
 
@@ -983,13 +984,13 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in inc16Mappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<ushort>("VAL16"), mapping.Input)
                         .Add<ushort, ushort>(vars.Get<ushort>("VAL16"), 1)
                         .Output             (vars.Get<ushort>("VAL16"), mapping.Output)
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
             }
 
             var dec16Mappings = new Mapping<ushort>[]
@@ -1002,13 +1003,13 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in dec16Mappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<ushort>("VAL16"), mapping.Input)
                         .Subtract<ushort>   (vars.Get<ushort>("VAL16"), 1)
                         .Output             (vars.Get<ushort>("VAL16"), mapping.Output)
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
             }
 
             var add16Mappings = new Mapping<ushort>[]
@@ -1021,7 +1022,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in add16Mappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<ushort>("VAL16"), () => registers.HL)
                         .WriteFlags         (() => registers.Flags)
@@ -1029,11 +1030,11 @@ namespace Dame.Emulator.Processor
                         .ReadFlags          (flags => registers.SetFlags(flags, ProcessorFlags.All ^ ProcessorFlags.Zero))
                         .Output             (vars.Get<ushort>("VAL16"), (ushort val) => registers.SetHL(val))
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
             }
 
             // ADD SP, r8
-            this.opcodes[0xE8] = new InstructionBuilder(0xE8, "ADD SP, r8", cpuContext)
+            this.opcodes.Add(0xE8, new InstructionBuilder(0xE8, "ADD SP, r8", cpuContext)
                     .With(b => b
                         .Input              (vars.Get<ushort>("VAL16"), () => registers.SP)
                         .Add<ushort, sbyte> (vars.Get<ushort>("VAL16"), () => assembly.Read().TwosComplement())
@@ -1042,14 +1043,14 @@ namespace Dame.Emulator.Processor
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<ushort>("VAL16"), (ushort val) => registers.SetSP(val))
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
 
             #endregion
 
             #region Shifts
 
             // RLCA
-            this.opcodes[0x07] = new InstructionBuilder(0x07, "RLCA", cpuContext)
+            this.opcodes.Add(0x07, new InstructionBuilder(0x07, "RLCA", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<byte>("VAL8"), () => registers.A)
                     .RotateLeft<byte>   (vars.Get<byte>("VAL8"), true)
@@ -1057,7 +1058,7 @@ namespace Dame.Emulator.Processor
                     .ReadFlags          (flags => registers.SetFlags(flags))
                     .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
                     .Cycle              ())
-                .Compile();
+                .Compile());
 
             var rlcMappings = new Mapping<byte>[]
             {
@@ -1073,18 +1074,18 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in rlcMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .RotateLeft<byte>   (vars.Get<byte>("VAL8"), true)
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
             }
 
             // RRCA
-            this.opcodes[0x0F] = new InstructionBuilder(0x0F, "RRCA", cpuContext)
+            this.opcodes.Add(0x0F, new InstructionBuilder(0x0F, "RRCA", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<byte>("VAL8"), () => registers.A)
                     .RotateRight<byte>  (vars.Get<byte>("VAL8"), true)
@@ -1092,7 +1093,7 @@ namespace Dame.Emulator.Processor
                     .ReadFlags          (flags => registers.SetFlags(flags))
                     .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
                     .Cycle              ())
-                .Compile();
+                .Compile());
 
             var rrcMappings = new Mapping<byte>[]
             {
@@ -1108,18 +1109,18 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in rrcMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .RotateRight<byte>  (vars.Get<byte>("VAL8"), true)
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
             }
 
             // RLA
-            this.opcodes[0x17] = new InstructionBuilder(0x17, "RLA", cpuContext)
+            this.opcodes.Add(0x17, new InstructionBuilder(0x17, "RLA", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<byte>("VAL8"), () => registers.A)
                     .WriteFlags         (() => registers.Flags)
@@ -1128,7 +1129,7 @@ namespace Dame.Emulator.Processor
                     .ReadFlags          (flags => registers.SetFlags(flags))
                     .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
                     .Cycle              ())
-                .Compile();
+                .Compile());
 
             var rlMappings = new Mapping<byte>[]
             {
@@ -1144,7 +1145,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in rlMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .WriteFlags         (() => registers.Flags)
@@ -1152,11 +1153,11 @@ namespace Dame.Emulator.Processor
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
             }
 
             // RRA
-            this.opcodes[0x1F] = new InstructionBuilder(0x1F, "RRCA", cpuContext)
+            this.opcodes.Add(0x1F, new InstructionBuilder(0x1F, "RRCA", cpuContext)
                 .With(b => b
                     .Input              (vars.Get<byte>("VAL8"), () => registers.A)
                     .WriteFlags         (() => registers.Flags)
@@ -1165,7 +1166,7 @@ namespace Dame.Emulator.Processor
                     .ReadFlags          (flags => registers.SetFlags(flags))
                     .Output             (vars.Get<byte>("VAL8"), (byte val) => registers.SetA(val))
                     .Cycle              ())
-                .Compile();
+                .Compile());
 
             var rrMappings = new Mapping<byte>[]
             {
@@ -1181,7 +1182,7 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in rrMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .WriteFlags         (() => registers.Flags)
@@ -1189,7 +1190,7 @@ namespace Dame.Emulator.Processor
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
             }
 
             var slaMappings = new Mapping<byte>[]
@@ -1206,14 +1207,14 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in slaMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .ShiftLeft<byte>    (vars.Get<byte>("VAL8"), false)
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
             }
 
             var sraMappings = new Mapping<byte>[]
@@ -1230,14 +1231,14 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in sraMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .ShiftRight<byte>   (vars.Get<byte>("VAL8"), true)
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
             }
 
             var swapMappings = new Mapping<byte>[]
@@ -1254,14 +1255,14 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in swapMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input      (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .Swap<byte> (vars.Get<byte>("VAL8"))
                         .ReadFlags  (flags => registers.SetFlags(flags))
                         .Output     (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle      (2))
-                    .Compile();
+                    .Compile());
             }
 
             var srlMappings = new Mapping<byte>[]
@@ -1278,14 +1279,14 @@ namespace Dame.Emulator.Processor
 
             foreach (var mapping in srlMappings)
             {
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input              (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .ShiftRight<byte>   (vars.Get<byte>("VAL8"), false)
                         .ReadFlags          (flags => registers.SetFlags(flags))
                         .Output             (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle              (2))
-                    .Compile();
+                    .Compile());
             }
 
             #endregion
@@ -1371,13 +1372,13 @@ namespace Dame.Emulator.Processor
             {
                 var bit = (mapping.Opcode - 0xCB_40) / 8;
 
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input          (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .TestBit<byte>  (vars.Get<byte>("VAL8"), bit)
                         .ReadFlags      (flags => registers.SetFlags(flags, ProcessorFlags.All ^ ProcessorFlags.Carry))
                         .Cycle          (2))
-                    .Compile();
+                    .Compile());
             }
 
             var setBitMappings = new Mapping<byte>[]
@@ -1532,13 +1533,13 @@ namespace Dame.Emulator.Processor
                 var bit = ((mapping.Opcode - 0xCB_80) / 8) % 8;
                 var value = mapping.Opcode > 0xCB_BF;
 
-                this.opcodes[mapping.Opcode] = new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
+                this.opcodes.Add(mapping.Opcode, new InstructionBuilder(mapping.Opcode, mapping.Mnemonic, cpuContext)
                     .With(b => b
                         .Input          (vars.Get<byte>("VAL8"), mapping.Input, mapping.InputCycles)
                         .SetBit<byte>   (vars.Get<byte>("VAL8"), bit, value)
                         .Output         (vars.Get<byte>("VAL8"), mapping.Output, mapping.OutputCycles)
                         .Cycle          (2))
-                    .Compile();
+                    .Compile());
             }
 
             #endregion
