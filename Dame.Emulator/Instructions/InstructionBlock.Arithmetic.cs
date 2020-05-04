@@ -12,12 +12,12 @@ namespace Dame.Emulator.Instructions
         public InstructionBlock Add<T, U>(ParameterExpression variable, Expression<InstructionValue<U>> expression, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
             where U : unmanaged
-            => Add<T, U>(variable, expression.Body, withCarry);
+            => Add<T, U>(variable, expression.Body, withCarry, setFlags);
 
         public InstructionBlock Add<T, U>(ParameterExpression variable, U value, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
             where U : unmanaged
-            => Add<T, U>(variable, Expression.Constant(value, typeof(U)), withCarry);
+            => Add<T, U>(variable, Expression.Constant(value, typeof(U)), withCarry, setFlags);
 
         public InstructionBlock Add<T, U>(ParameterExpression variable, Expression expression, bool withCarry = false, bool setFlags = true)
             where T : unmanaged
