@@ -645,7 +645,6 @@ namespace Dame.Emulator.Processor
                 new Mapping<ushort>(0xC1, "POP", "BC", val => registers.SetBC(val)),
                 new Mapping<ushort>(0xD1, "POP", "DE", val => registers.SetDE(val)),
                 new Mapping<ushort>(0xE1, "POP", "HL", val => registers.SetHL(val)),
-                new Mapping<ushort>(0xF1, "POP", "AF", val => registers.SetAF(val)),
             };
 
             foreach (var mapping in popMappings)
@@ -660,6 +659,17 @@ namespace Dame.Emulator.Processor
                         .Cycle              ())
                     .Compile());
             }
+
+            // POP AF
+            this.opcodes.Add(0xF1, new InstructionBuilder(0xF1, "POP AF", cpuContext)
+                    .With(b => b
+                        .Input              (vars.Get<ushort>("PTR16"), () => memoryController.ReadDouble(registers.SP), 2)
+                        .Output             (vars.Get<ushort>("PTR16"), (ushort val) => registers.SetAF((ushort)(val & 0xFFF0)))
+                        .Input              (vars.Get<ushort>("STACK16"), () => registers.SP)
+                        .Add<ushort, ushort>(vars.Get<ushort>("STACK16"), 2)
+                        .Output             (vars.Get<ushort>("STACK16"), (ushort val) => registers.SetSP(val))
+                        .Cycle              ())
+                    .Compile());
 
             #endregion
 
