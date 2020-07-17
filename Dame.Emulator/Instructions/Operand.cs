@@ -9,14 +9,14 @@ namespace Dame.Emulator.Instructions
 
         public Register Register
         {
-            get => Type == OperandType.Register || Type == OperandType.RegisterLong
+            get => Type == OperandType.RegisterValue || Type == OperandType.RegisterValueLong
                 ? (Register)Parameter
                 : throw new InvalidOperationException();
         }
 
         public int Address => Parameter;
 
-        public Operand(Register register)
+        public Operand(Register register, bool isPointer)
         {
             Parameter = (int)register;
 
@@ -30,7 +30,7 @@ namespace Dame.Emulator.Instructions
                 case Register.E:
                 case Register.H:
                 case Register.L:
-                    Type = OperandType.Register;
+                    Type = isPointer ? OperandType.RegisterAddress : OperandType.RegisterValue;
                     break;
                 
                 case Register.AF:
@@ -39,7 +39,7 @@ namespace Dame.Emulator.Instructions
                 case Register.HL:
                 case Register.SP:
                 case Register.PC:
-                    Type = OperandType.RegisterLong;
+                    Type = isPointer ? OperandType.RegisterAddressLong : OperandType.RegisterValueLong;
                     break;
 
                 default:
@@ -51,6 +51,12 @@ namespace Dame.Emulator.Instructions
         {
             Type = isLong ? OperandType.MemoryLong : OperandType.Memory;
             Parameter = memoryAddress;
+        }
+
+        public Operand(int constant)
+        {
+            Type = OperandType.Constant;
+            Parameter = constant;
         }
     }
 }
