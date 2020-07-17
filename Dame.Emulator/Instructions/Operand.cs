@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace Dame.Emulator.Instructions
 {
@@ -58,5 +59,29 @@ namespace Dame.Emulator.Instructions
             Type = OperandType.Constant;
             Parameter = constant;
         }
+
+        public override string ToString()
+        {
+            switch (Type)
+            {
+                case OperandType.Constant:
+                    return Parameter.ToString();
+                
+                case OperandType.Memory:
+                case OperandType.MemoryLong:
+                    return $"0x{Parameter.ToString("X")}";
+                    
+                case OperandType.RegisterAddress:
+                case OperandType.RegisterAddressLong:
+                    return $"({Enum.GetName(typeof(Register), Parameter)})";
+
+                case OperandType.RegisterValue:
+                case OperandType.RegisterValueLong:
+                    return $"{Enum.GetName(typeof(Register), Parameter)}";
+
+                default:
+                    throw new InvalidDataException($"{nameof(Type)} is not a valid member of {nameof(OperandType)}!");
+            }
+        } 
     }
 }
