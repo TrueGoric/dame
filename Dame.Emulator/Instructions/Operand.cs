@@ -8,15 +8,14 @@ namespace Dame.Emulator.Instructions
         public OperandType Type { get; }
         public int Parameter { get; }
 
-        public Register Register
-        {
-            get => Type == OperandType.RegisterValue || Type == OperandType.RegisterValueLong
+        public Register Register => Type == OperandType.RegisterValue || Type == OperandType.RegisterValueLong
                 ? (Register)Parameter
                 : throw new InvalidOperationException();
-        }
 
-        public int Address => Parameter;
-
+        public int Address => Type == OperandType.Memory || Type == OperandType.MemoryLong
+                ? Parameter
+                : throw new InvalidOperationException();
+        
         public Operand(Register register, bool isPointer)
         {
             Parameter = (int)register;
