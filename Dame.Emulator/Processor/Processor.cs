@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Dame.Emulator.Accessors;
-using Dame.Emulator.Architecture;
 using Dame.Emulator.Exceptions;
 using Dame.Emulator.Instructions;
 using Dame.Emulator.Memory;

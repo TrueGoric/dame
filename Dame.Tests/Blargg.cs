@@ -4,7 +4,6 @@ using Moq;
 using Dame.Emulator.Graphics;
 using Dame.Emulator.Memory;
 using Dame.Emulator.Processor;
-using Dame.Emulator.Architecture;
 using Dame.Emulator.Graphics.Rendering;
 using Dame.Emulator.Memory.Blocks;
 using System.Text;
@@ -25,11 +24,9 @@ namespace Dame.Tests
             mockRenderer.DefaultValue = DefaultValue.Mock;
             mockRenderer.SetupAllProperties();
 
-            var context = new ProcessorExecutionContext();
-
             var registers = new RegisterBank();
             var memory = new MemoryController(0x10000, silenceErrors: true);
-            var processor = new Processor(registers, memory, context);
+            var processor = new Processor(registers, memory);
             var graphics = new Graphics(mockRenderer.Object);
 
             ICartridge testCart;
