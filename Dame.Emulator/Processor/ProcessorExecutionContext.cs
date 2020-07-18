@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using Dame.Emulator.Memory;
+using Dame.Emulator.Processor;
 
-namespace Dame.Emulator.Architecture
+namespace Dame.Emulator.Processor
 {
     public class ProcessorExecutionContext
     {
@@ -28,7 +30,16 @@ namespace Dame.Emulator.Architecture
         /// <value>Clock frequency in Hz.</value>
         public uint Frequency { get; set; } = Freq1MHz;
 
+        public RegisterBank Registers { get; }
+        public MemoryController Memory { get; }
+
         public long Ticks => tick;
+
+        internal ProcessorExecutionContext(RegisterBank registers, MemoryController memory)
+        {
+            Registers = registers;
+            Memory = memory;
+        }
 
         public void Register(ISynchronizable synchronizable)
         {

@@ -18,11 +18,13 @@ namespace Dame.Emulator.Processor
 
         private Dictionary<int, Instruction> opcodes;
 
-        public Processor(RegisterBank registerBank, MemoryController memory, ProcessorExecutionContext context)
+        public ProcessorExecutionContext Context => cpuContext;
+
+        public Processor(RegisterBank registerBank, MemoryController memory)
         {
             registers = registerBank;
             memoryController = memory;
-            cpuContext = context;
+            cpuContext = new ProcessorExecutionContext(registerBank, memory);
 
             assembly = new AssemblyAccessor(memoryController, registers);
 
