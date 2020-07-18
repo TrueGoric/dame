@@ -30,7 +30,6 @@ namespace Dame.Emulator.Processor
             opcodes = new Dictionary<int, Instruction>();
 
             InitRegisters();
-            MapOpcodes();
         }
 
         public void Step()
