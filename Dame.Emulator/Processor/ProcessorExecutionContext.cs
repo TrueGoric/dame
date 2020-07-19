@@ -33,6 +33,8 @@ namespace Dame.Emulator.Processor
         public RegisterBank Registers { get; }
         public MemoryController Memory { get; }
 
+        public ushort Location => Registers.PC;
+
         public long Ticks => tick;
 
         internal ProcessorExecutionContext(RegisterBank registers, MemoryController memory)
@@ -78,6 +80,34 @@ namespace Dame.Emulator.Processor
 
             stopwatch.Restart();
             lastSync = tick;
+        }
+
+        public byte ReadAndAdvance()
+        {
+            var value = Memory.Read(Registers.PC);
+
+            Advance(1);
+
+            return value;
+        }
+
+        public ushort ReadDoubleAndAdvance()
+        {
+            var value = Memory.ReadDouble(Registers.PC);
+
+            Advance(2);
+
+            return value;
+        }
+
+        public void Jump(ushort address)
+        {
+            Registers.PC = address;
+        }
+
+        public void Advance(ushort bytes = 1)
+        {
+            Registers.PC += bytes;
         }
     }
 }
