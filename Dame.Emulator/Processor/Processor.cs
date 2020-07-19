@@ -10,7 +10,7 @@ namespace Dame.Emulator.Processor
     public sealed partial class Processor
     {
         private ProcessorExecutionContext cpuContext;
-        private RegisterBank registers;
+        private RegisterBank registerBank;
         private MemoryController memoryController;
 
         private AssemblyAccessor assembly;
@@ -19,13 +19,14 @@ namespace Dame.Emulator.Processor
 
         public ProcessorExecutionContext Context => cpuContext;
 
-        public Processor(RegisterBank registerBank, MemoryController memory)
+        public Processor(RegisterBank registers, MemoryController memory)
         {
-            registers = registerBank;
+            registerBank = registers;
             memoryController = memory;
-            cpuContext = new ProcessorExecutionContext(registerBank, memory);
 
-            assembly = new AssemblyAccessor(memoryController, registers);
+            cpuContext = new ProcessorExecutionContext(registerBank, memoryController);
+
+            assembly = new AssemblyAccessor(memoryController, registerBank);
 
             opcodes = new Dictionary<int, Instruction>();
 
@@ -40,7 +41,7 @@ namespace Dame.Emulator.Processor
 
             opcode = assembly.Read();
 
-            if (registers.PC >= 0x21)
+            if (registerBank.PC >= 0x21)
                 opcode = opcode;
 
             if (opcode == 0xCB)
@@ -66,12 +67,12 @@ namespace Dame.Emulator.Processor
 
         private void InitRegisters()
         {
-            registers.AF = 0x01B0;
-            registers.BC = 0x0013;
-            registers.DE = 0x00D8;
-            registers.HL = 0x014D;
+            registerBank.AF = 0x01B0;
+            registerBank.BC = 0x0013;
+            registerBank.DE = 0x00D8;
+            registerBank.HL = 0x014D;
 
-            registers.SP = 0xFFFE;
+            registerBank.SP = 0xFFFE;
         }
     }
 }
