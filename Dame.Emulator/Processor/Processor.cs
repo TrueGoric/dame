@@ -62,7 +62,7 @@ namespace Dame.Emulator.Processor
 
             // Console.WriteLine(instruction.Name);
             
-            instruction.Invoker();
+            instruction(cpuContext);
         }
 
         private void InitRegisters()
