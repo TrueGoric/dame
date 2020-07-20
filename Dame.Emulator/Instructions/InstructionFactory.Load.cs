@@ -54,17 +54,21 @@ namespace Dame.Emulator.Instructions
 
         #endregion
 
-        public static void LoadConstantToStack(ILGenerator gen, byte value)
+        public static ILGenerator LoadConstantToStack(this ILGenerator gen, byte value)
         {
             gen.Emit(OpCodes.Ldc_I4_S, value);
+
+            return gen;
         }
 
-        public static void LoadConstantToStack(ILGenerator gen, ushort value)
+        public static ILGenerator LoadConstantToStack(this ILGenerator gen, ushort value)
         {
             gen.Emit(OpCodes.Ldc_I4, value);
+
+            return gen;
         }
 
-        public static void LoadRegisterToStack(ILGenerator gen, Register register)
+        public static ILGenerator LoadRegisterToStack(this ILGenerator gen, Register register)
         {
             gen.Emit(OpCodes.Ldloc_0);
 
@@ -88,39 +92,49 @@ namespace Dame.Emulator.Instructions
 
                 default: throw new ArgumentException($"{register} is not a valid member of {nameof(Register)} enum!", nameof(register));
             }
+
+            return gen;
         }
 
-        public static void LoadMemoryToStack(ILGenerator gen)
+        public static ILGenerator LoadMemoryToStack(this ILGenerator gen)
         {
             // gets the value at the top of the stack as an address
             gen.Emit(OpCodes.Stloc_3);
             gen.Emit(OpCodes.Ldloc_1);
             gen.Emit(OpCodes.Ldloc_3);
             gen.EmitCall(OpCodes.Call, ReadMemoryMethod, null);
+
+            return gen;
         }
 
-        public static void LoadMemoryDoubleToStack(ILGenerator gen)
+        public static ILGenerator LoadMemoryDoubleToStack(this ILGenerator gen)
         {
             // gets the value at the top of the stack as an address
             gen.Emit(OpCodes.Stloc_3);
             gen.Emit(OpCodes.Ldloc_1);
             gen.Emit(OpCodes.Ldloc_3);
             gen.EmitCall(OpCodes.Call, ReadDoubleMemoryMethod, null);
+
+            return gen;
         }
 
-        public static void LoadPCToStackAndAdvance(ILGenerator gen)
+        public static ILGenerator LoadPCToStackAndAdvance(this ILGenerator gen)
         {
             gen.Emit(OpCodes.Ldarg_0);
             gen.EmitCall(OpCodes.Call, ReadAndAdvanceMethod, null);
+
+            return gen;
         }
 
-        public static void LoadDoublePCToStackAndAdvance(ILGenerator gen)
+        public static ILGenerator LoadDoublePCToStackAndAdvance(this ILGenerator gen)
         {
             gen.Emit(OpCodes.Ldarg_0);
             gen.EmitCall(OpCodes.Call, ReadDoubleAndAdvanceMethod, null);
+
+            return gen;
         }
 
-        public static void WriteStackToRegister(ILGenerator gen, Register register)
+        public static ILGenerator WriteStackToRegister(this ILGenerator gen, Register register)
         {
             // load the last stack value to an appropriate local var and then back to the stack
             switch (register)
@@ -172,6 +186,8 @@ namespace Dame.Emulator.Instructions
 
                 default: throw new ArgumentException($"{register} is not a valid member of {nameof(Register)} enum!", nameof(register));
             }
+
+            return gen;
         }
     }
 }

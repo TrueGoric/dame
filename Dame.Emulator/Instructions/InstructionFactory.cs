@@ -20,14 +20,16 @@ namespace Dame.Emulator.Instructions
             .GetGetMethod();
         private static MethodInfo CycleMethod = typeof(ProcessorExecutionContext).GetMethod(nameof(ProcessorExecutionContext.Cycle));
 
-        public static void EmitNop(ILGenerator gen)
+        public static ILGenerator EmitNop(this ILGenerator gen)
         {
             gen.Emit(OpCodes.Nop); // temp, will be omitted
+
+            return gen;
         }
 
         #region Common
 
-        public static DynamicMethod CreateJITMethod(string name)
+        public static DynamicMethod CreateMethod(string name)
         {
             var method = new DynamicMethod(name, null, new[] { typeof(ProcessorExecutionContext) });
             var gen = method.GetILGenerator();
@@ -50,7 +52,7 @@ namespace Dame.Emulator.Instructions
             return method;
         }
 
-        public static void FinishMethod(ILGenerator gen)
+        public static void FinishMethod(this ILGenerator gen)
         {
             gen.Emit(OpCodes.Ret);
         }
@@ -59,23 +61,30 @@ namespace Dame.Emulator.Instructions
 
         #region Control
 
-        public static void EmitControlRoutine(ILGenerator gen)
+        public static ILGenerator EmitControlRoutine(this ILGenerator gen, byte cycles = 1)
         {
-            EmitCycleCall(gen);
+            EmitCycleCall(gen, cycles);
             EmitInterruptHandler(gen);
             // TODO: check if PC checks out
             // TODO: advance PC
+
+            return gen;
         }
 
-        public static void EmitCycleCall(ILGenerator gen)
+        public static ILGenerator EmitCycleCall(this ILGenerator gen, byte cycles = 1)
         {
             gen.Emit(OpCodes.Ldarg_0); // assumes the ProcessorExecutionContext is the first argument passed to the dynamic method
+            gen.Emit(OpCodes.Ldc_I4_S, cycles);
             gen.EmitCall(OpCodes.Call, CycleMethod, null);
+
+            return gen;
         }
 
-        public static void EmitInterruptHandler(ILGenerator gen)
+        public static ILGenerator EmitInterruptHandler(this ILGenerator gen)
         {
             // TODO: emit interrupts
+
+            return gen;
         }
 
         #endregion
