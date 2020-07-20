@@ -96,6 +96,15 @@ namespace Dame.Emulator.Instructions
             gen.Emit(OpCodes.Stloc_3);
             gen.Emit(OpCodes.Ldloc_1);
             gen.Emit(OpCodes.Ldloc_3);
+            gen.EmitCall(OpCodes.Call, ReadMemoryMethod, null);
+        }
+
+        public static void LoadMemoryDoubleToStack(ILGenerator gen)
+        {
+            // gets the value at the top of the stack as an address
+            gen.Emit(OpCodes.Stloc_3);
+            gen.Emit(OpCodes.Ldloc_1);
+            gen.Emit(OpCodes.Ldloc_3);
             gen.EmitCall(OpCodes.Call, ReadDoubleMemoryMethod, null);
         }
 
