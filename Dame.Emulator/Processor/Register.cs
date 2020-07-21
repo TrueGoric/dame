@@ -4,8 +4,8 @@ namespace Dame.Emulator.Processor
 {
     public enum Register : byte
     {
-        A, F, B, C, D, E, H, L,
-        AF, BC, DE, HL,
+        B, C, D, E, H, L, F, A,
+        BC, DE, HL, AF,
         SP, PC
     }
 }
