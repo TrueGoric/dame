@@ -55,6 +55,7 @@ namespace Dame.Emulator.JIT
             gen.DeclareLocal(typeof(MemoryController));
             gen.DeclareLocal(typeof(byte)); // working var
             gen.DeclareLocal(typeof(ushort)); // working var
+            gen.DeclareLocal(typeof(int)); // working var, for addresses
 
             // load register bank to a local variable
             gen.Emit(OpCodes.Ldarg_0);

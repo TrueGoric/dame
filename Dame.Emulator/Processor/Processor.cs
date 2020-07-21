@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Dame.Emulator.Accessors;
 using Dame.Emulator.Exceptions;
 using Dame.Emulator.Instructions;
+using Dame.Emulator.JIT;
 using Dame.Emulator.Memory;
 
 namespace Dame.Emulator.Processor
@@ -62,7 +63,7 @@ namespace Dame.Emulator.Processor
 
             // Console.WriteLine(instruction.Name);
             
-            instruction(cpuContext);
+            instruction.Invoker(cpuContext);
         }
 
         private void InitRegisters()

@@ -52,25 +52,28 @@ namespace Dame.Emulator.JIT
         private static MethodInfo ReadMemoryMethod = typeof(MemoryController).GetMethod(nameof(MemoryController.Read));
         private static MethodInfo ReadDoubleMemoryMethod = typeof(MemoryController).GetMethod(nameof(MemoryController.ReadDouble));
 
+        private static MethodInfo WriteMemoryMethod = typeof(MemoryController).GetMethod(nameof(MemoryController.Write));
+        private static MethodInfo WriteDoubleMemoryMethod = typeof(MemoryController).GetMethod(nameof(MemoryController.WriteDouble));
+
         #endregion
 
         public static ILGenerator LoadConstantToStack(this ILGenerator gen, byte value)
         {
-            gen.Emit(OpCodes.Ldc_I4_S, value);
+            gen.Emit(OpCodes.Ldc_I4_S, value);  // load constant (value)
 
             return gen;
         }
 
         public static ILGenerator LoadConstantToStack(this ILGenerator gen, ushort value)
         {
-            gen.Emit(OpCodes.Ldc_I4, value);
+            gen.Emit(OpCodes.Ldc_I4, value);    // load constant (value)
 
             return gen;
         }
 
         public static ILGenerator LoadRegisterToStack(this ILGenerator gen, Register register)
         {
-            gen.Emit(OpCodes.Ldloc_0);
+            gen.Emit(OpCodes.Ldloc_0);  // load RegisterBank
 
             switch (register)
             {
@@ -99,9 +102,10 @@ namespace Dame.Emulator.JIT
         public static ILGenerator LoadMemoryToStack(this ILGenerator gen)
         {
             // gets the value at the top of the stack as an address
-            gen.Emit(OpCodes.Stloc_3);
-            gen.Emit(OpCodes.Ldloc_1);
-            gen.Emit(OpCodes.Ldloc_3);
+            gen.Emit(OpCodes.Stloc_3);  // store ushort
+            gen.Emit(OpCodes.Ldloc_1);  // load MemoryController
+            gen.Emit(OpCodes.Ldloc_3);  // load ushort
+
             gen.EmitCall(OpCodes.Call, ReadMemoryMethod, null);
 
             return gen;
@@ -110,9 +114,10 @@ namespace Dame.Emulator.JIT
         public static ILGenerator LoadMemoryDoubleToStack(this ILGenerator gen)
         {
             // gets the value at the top of the stack as an address
-            gen.Emit(OpCodes.Stloc_3);
-            gen.Emit(OpCodes.Ldloc_1);
-            gen.Emit(OpCodes.Ldloc_3);
+            gen.Emit(OpCodes.Stloc_3);  // store ushort
+            gen.Emit(OpCodes.Ldloc_1);  // load MemoryController
+            gen.Emit(OpCodes.Ldloc_3);  // load ushort
+
             gen.EmitCall(OpCodes.Call, ReadDoubleMemoryMethod, null);
 
             return gen;
@@ -120,7 +125,8 @@ namespace Dame.Emulator.JIT
 
         public static ILGenerator LoadPCToStackAndAdvance(this ILGenerator gen)
         {
-            gen.Emit(OpCodes.Ldarg_0);
+            gen.Emit(OpCodes.Ldarg_0);  // load ProcessorExecutionContext
+
             gen.EmitCall(OpCodes.Call, ReadAndAdvanceMethod, null);
 
             return gen;
@@ -128,7 +134,8 @@ namespace Dame.Emulator.JIT
 
         public static ILGenerator LoadDoublePCToStackAndAdvance(this ILGenerator gen)
         {
-            gen.Emit(OpCodes.Ldarg_0);
+            gen.Emit(OpCodes.Ldarg_0);  // load ProcessorExecutionContext
+
             gen.EmitCall(OpCodes.Call, ReadDoubleAndAdvanceMethod, null);
 
             return gen;
@@ -148,9 +155,9 @@ namespace Dame.Emulator.JIT
                 case Register.E:
                 case Register.H:
                 case Register.L:
-                    gen.Emit(OpCodes.Stloc_2);
-                    gen.Emit(OpCodes.Ldloc_0);
-                    gen.Emit(OpCodes.Ldloc_2);
+                    gen.Emit(OpCodes.Stloc_2);  // store byte
+                    gen.Emit(OpCodes.Ldloc_0);  // load RegisterBank
+                    gen.Emit(OpCodes.Ldloc_2);  // load byte
                     break;
 
                 // ushort
@@ -160,9 +167,9 @@ namespace Dame.Emulator.JIT
                 case Register.HL:
                 case Register.SP:
                 case Register.PC:
-                    gen.Emit(OpCodes.Stloc_3);
-                    gen.Emit(OpCodes.Ldloc_0);
-                    gen.Emit(OpCodes.Ldloc_3);
+                    gen.Emit(OpCodes.Stloc_3);  // store ushort
+                    gen.Emit(OpCodes.Ldloc_0);  // load RegisterBank
+                    gen.Emit(OpCodes.Ldloc_3);  // load ushort
                     break;
             }
 
@@ -186,6 +193,60 @@ namespace Dame.Emulator.JIT
 
                 default: throw new ArgumentException($"{register} is not a valid member of {nameof(Register)} enum!", nameof(register));
             }
+
+            return gen;
+        }
+
+        public static ILGenerator WriteStackToMemory(this ILGenerator gen)
+        {
+            // assumes that the first value on the stack is the value and the second - the address
+            gen.Emit(OpCodes.Stloc_2);          // store byte
+            gen.Emit(OpCodes.Stloc_S, (byte)4); // store int
+            gen.Emit(OpCodes.Ldloc_1);          // load MemoryController
+            gen.Emit(OpCodes.Ldloc_S, (byte)4); // load int
+            gen.Emit(OpCodes.Ldloc_2);          // load byte
+
+            gen.EmitCall(OpCodes.Call, WriteMemoryMethod, null);
+
+            return gen;
+        }
+
+        public static ILGenerator WriteStackToMemory(this ILGenerator gen, int address)
+        {
+            // assumes that the value on the stack is the value
+            gen.Emit(OpCodes.Stloc_2);          // store byte
+            gen.Emit(OpCodes.Ldloc_1);          // load MemoryController
+            gen.Emit(OpCodes.Ldc_I4, address);  // load constant (address)
+            gen.Emit(OpCodes.Ldloc_2);          // load byte
+            
+            gen.EmitCall(OpCodes.Call, WriteMemoryMethod, null);
+
+            return gen;
+        }
+
+        public static ILGenerator WriteDoubleStackToMemory(this ILGenerator gen)
+        {
+            // assumes that the first value on the stack is the value and the second - the address
+            gen.Emit(OpCodes.Stloc_3);          // store ushort
+            gen.Emit(OpCodes.Stloc_S, (byte)4); // store int
+            gen.Emit(OpCodes.Ldloc_1);          // load MemoryController
+            gen.Emit(OpCodes.Ldloc_S, (byte)4); // load int
+            gen.Emit(OpCodes.Ldloc_3);          // load ushort
+
+            gen.EmitCall(OpCodes.Call, WriteDoubleMemoryMethod, null);
+
+            return gen;
+        }
+
+        public static ILGenerator WriteDobuleStackToMemory(this ILGenerator gen, int address)
+        {
+            // assumes that the value on the stack is the value
+            gen.Emit(OpCodes.Stloc_3);          // store ushort
+            gen.Emit(OpCodes.Ldloc_1);          // load MemoryController
+            gen.Emit(OpCodes.Ldc_I4, address);  // load constant (address)
+            gen.Emit(OpCodes.Ldloc_3);          // load ushort
+            
+            gen.EmitCall(OpCodes.Call, WriteDoubleMemoryMethod, null);
 
             return gen;
         }
