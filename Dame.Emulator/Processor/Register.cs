@@ -1,6 +1,6 @@
 using System;
 
-namespace Dame.Emulator.Instructions
+namespace Dame.Emulator.Processor
 {
     public enum Register : byte
     {

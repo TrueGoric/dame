@@ -8,9 +8,9 @@ using Dame.Emulator.Processor;
 
 [assembly: InternalsVisibleTo("Dame.Tests")]
 
-namespace Dame.Emulator.Instructions
+namespace Dame.Emulator.JIT
 {
-    internal static partial class InstructionFactory
+    internal static partial class CodeFactory
     {
         private static MethodInfo GetRegistersMethod = typeof(ProcessorExecutionContext)
             .GetProperty(nameof(ProcessorExecutionContext.Registers))
@@ -29,11 +29,28 @@ namespace Dame.Emulator.Instructions
 
         #region Common
 
-        public static DynamicMethod CreateMethod(string name)
+        public static DynamicMethod CreateInstructionMethod(string name)
         {
             var method = new DynamicMethod(name, null, new[] { typeof(ProcessorExecutionContext) });
             var gen = method.GetILGenerator();
 
+            InitMethod(gen);
+
+            return method;
+        }
+
+        public static DynamicMethod CreateJITMethod(string name)
+        {
+            var method = new DynamicMethod(name, null, new[] { typeof(ProcessorExecutionContext), typeof(int) });
+            var gen = method.GetILGenerator();
+
+            InitMethod(gen);
+
+            return method;
+        }
+
+        private static void InitMethod(ILGenerator gen)
+        {
             gen.DeclareLocal(typeof(RegisterBank));
             gen.DeclareLocal(typeof(MemoryController));
             gen.DeclareLocal(typeof(byte)); // working var
@@ -48,8 +65,6 @@ namespace Dame.Emulator.Instructions
             gen.Emit(OpCodes.Ldarg_0);
             gen.EmitCall(OpCodes.Callvirt, GetMemoryControllerMethod, null);
             gen.Emit(OpCodes.Stloc_1);
-
-            return method;
         }
 
         public static void FinishMethod(this ILGenerator gen)

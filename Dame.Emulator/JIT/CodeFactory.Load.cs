@@ -4,9 +4,9 @@ using System.Reflection.Emit;
 using Dame.Emulator.Memory;
 using Dame.Emulator.Processor;
 
-namespace Dame.Emulator.Instructions
+namespace Dame.Emulator.JIT
 {
-    internal static partial class InstructionFactory
+    internal static partial class CodeFactory
     {
         #region Read & Advance Methods
 
